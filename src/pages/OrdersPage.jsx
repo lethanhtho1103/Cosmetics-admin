@@ -17,7 +17,7 @@ const orderStats = {
 const OrdersPage = () => {
   return (
     <div className="flex-1 relative z-10 overflow-auto">
-      <Header title={"Orders"} />
+      <Header title={"Đơn Hàng"} />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         <motion.div
@@ -27,25 +27,25 @@ const OrdersPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Orders"
+            name="Tổng Đơn Hàng"
             icon={ShoppingBag}
             value={orderStats.totalOrders}
             color="#6366F1"
           />
           <StatCard
-            name="Pending Orders"
+            name="Đơn Chờ Xử Lý"
             icon={Clock}
             value={orderStats.pendingOrders}
             color="#F59E0B"
           />
           <StatCard
-            name="Completed Orders"
+            name="Đơn Hoàn Thành"
             icon={CheckCircle}
             value={orderStats.completedOrders}
             color="#10B981"
           />
           <StatCard
-            name="Total Revenue"
+            name="Tổng Doanh Thu"
             icon={DollarSign}
             value={orderStats.totalRevenue}
             color="#EF4444"

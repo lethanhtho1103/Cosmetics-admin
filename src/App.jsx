@@ -7,7 +7,7 @@ import SalesPage from "./pages/SalesPage";
 import OrdersPage from "./pages/OrdersPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import SettingsPage from "./pages/SettingsPage";
-import LoginAdmin from "./pages/Login";
+import LoginAdmin from "./pages/LoginPage";
 import { useSelector } from "react-redux";
 
 function App() {
