@@ -14,11 +14,6 @@ const ProductsPage = () => {
     setCategories(res);
   };
 
-  const handleAddProduct = (productData) => {
-    console.log("Product added:", productData);
-    // Thực hiện logic thêm sản phẩm
-  };
-
   useEffect(() => {
     handleGetAllCategories();
   }, []);
@@ -36,7 +31,6 @@ const ProductsPage = () => {
       <AddProductModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        handleAddProduct={handleAddProduct}
         categories={categories}
       />
 

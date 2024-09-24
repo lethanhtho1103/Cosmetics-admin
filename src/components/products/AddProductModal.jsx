@@ -2,7 +2,7 @@ import { useState } from "react";
 import productService from "../../services/productService";
 import { toast } from "react-toastify";
 
-const AddProductModal = ({ isOpen, onClose, handleAddProduct, categories }) => {
+const AddProductModal = ({ isOpen, onClose, categories }) => {
   const [productData, setProductData] = useState({
     name: "",
     price: "",
@@ -71,7 +71,6 @@ const AddProductModal = ({ isOpen, onClose, handleAddProduct, categories }) => {
 
     try {
       const res = await productService.createProduct(formData);
-      handleAddProduct(); // Trigger parent update after product addition
       toast.success(res.message);
       onClose(); // Close modal
     } catch (error) {
@@ -211,7 +210,6 @@ const AddProductModal = ({ isOpen, onClose, handleAddProduct, categories }) => {
             )}
           </div>
 
-          {/* Category Select */}
           <div>
             <select
               name="category_id"
@@ -235,7 +233,6 @@ const AddProductModal = ({ isOpen, onClose, handleAddProduct, categories }) => {
             )}
           </div>
 
-          {/* Description Text Area */}
           <div>
             <textarea
               name="description"

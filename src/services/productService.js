@@ -43,6 +43,15 @@ const productService = {
     const res = await axios.post("/api/product", formData);
     return res.data;
   },
+
+  async deleteProduct(productId) {
+    try {
+      const res = await axios.delete(`/api/product/${productId}`);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
 
 export default productService;

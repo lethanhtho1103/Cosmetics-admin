@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { Edit, Search, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import productService from "../../services/productService";
 import { baseUrl } from "../../axios";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { toast } from "react-toastify";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 const ProductsTable = ({ categories }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +17,8 @@ const ProductsTable = ({ categories }) => {
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const indexOfLastProduct = currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
@@ -27,18 +31,22 @@ const ProductsTable = ({ categories }) => {
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    const filtered = products.filter((product) => {
-      return (
-        (product.name?.toLowerCase() || "").includes(term) ||
-        (product.category?.toLowerCase() || "").includes(term) ||
-        (product.price?.toString() || "").toLowerCase().includes(term) ||
-        (product.quantity?.toString() || "").toLowerCase().includes(term) ||
-        (product.trademark?.toLowerCase() || "").includes(term) ||
-        (product.origin?.toLowerCase() || "").includes(term) ||
-        (product.sold_quantity?.toString() || "").toLowerCase().includes(term)
-      );
-    });
-    setFilteredProducts(filtered);
+    if (term === "") {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter((product) => {
+        return (
+          (product.name?.toLowerCase() || "").includes(term) ||
+          (product.category?.toLowerCase() || "").includes(term) ||
+          (product.price?.toString() || "").toLowerCase().includes(term) ||
+          (product.quantity?.toString() || "").toLowerCase().includes(term) ||
+          (product.trademark?.toLowerCase() || "").includes(term) ||
+          (product.origin?.toLowerCase() || "").includes(term) ||
+          (product.sold_quantity?.toString() || "").toLowerCase().includes(term)
+        );
+      });
+      setFilteredProducts(filtered);
+    }
   };
 
   // Function to sort products
@@ -50,22 +58,26 @@ const ProductsTable = ({ categories }) => {
     setSortConfig({ key, direction });
   };
 
+  const sortedProducts = useMemo(() => {
+    if (!sortConfig.key) return filteredProducts;
+
+    const sorted = [...filteredProducts];
+    sorted.sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === "ascending" ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === "ascending" ? 1 : -1;
+      }
+      return 0;
+    });
+
+    return sorted;
+  }, [filteredProducts, sortConfig]);
+
   useEffect(() => {
-    let sortedProducts = [...filteredProducts];
-    if (sortConfig.key) {
-      sortedProducts.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === "ascending" ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === "ascending" ? 1 : -1;
-        }
-        return 0;
-      });
-      setFilteredProducts(sortedProducts);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortConfig]);
+    setFilteredProducts(sortedProducts);
+  }, [sortedProducts]);
 
   const handleGetAllProducts = async (categoryName) => {
     if (categoryName) {
@@ -84,6 +96,38 @@ const ProductsTable = ({ categories }) => {
   const handleCategoryChange = (e) => {
     const selected = e.target.value;
     setSelectedCategory(selected);
+    handleGetAllProducts(selected); // Fetch new products after selecting a category.
+  };
+
+  const handleDelete = async (productId) => {
+    try {
+      const res = await productService.deleteProduct(productId);
+      toast.success(res.message);
+      handleGetAllProducts(selectedCategory);
+
+      if (currentPage > 1 && currentProducts.length === 1) {
+        setCurrentPage((prev) => prev - 1);
+      }
+    } catch (error) {
+      toast.error("Lỗi khi xóa");
+    }
+  };
+
+  const openDeleteModal = (product) => {
+    setProductToDelete(product);
+    setIsModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsModalOpen(false);
+    setProductToDelete(null);
+  };
+
+  const confirmDelete = () => {
+    if (productToDelete) {
+      handleDelete(productToDelete._id);
+      closeDeleteModal();
+    }
   };
 
   useEffect(() => {
@@ -133,7 +177,6 @@ const ProductsTable = ({ categories }) => {
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
         </div>
       </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
@@ -208,8 +251,11 @@ const ProductsTable = ({ categories }) => {
                   <button className="text-indigo-400 hover:text-indigo-300 mr-2">
                     <Edit size={18} />
                   </button>
-                  <button className="text-red-400 hover:text-red-300">
-                    <Trash2 size={18} />
+                  <button
+                    onClick={() => openDeleteModal(product)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    <Trash2 size={20} />
                   </button>
                 </td>
               </motion.tr>
@@ -260,6 +306,12 @@ const ProductsTable = ({ categories }) => {
           </button>
         </div>
       </div>
+      <ConfirmDeleteModal
+        isOpen={isModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        productName={productToDelete?.name}
+      />
     </motion.div>
   );
 };
