@@ -87,10 +87,13 @@ const ProductsTable = ({ categories }) => {
   };
 
   useEffect(() => {
-    if (selectedCategory) {
-      handleGetAllProducts(selectedCategory);
+    // Fetch products when the component mounts, or when `selectedCategory` changes.
+    if (categories && categories.length > 0) {
+      const initialCategory = categories[0]?.name;
+      setSelectedCategory(initialCategory);
+      handleGetAllProducts(initialCategory); // Trigger fetch when component mounts with initial category.
     }
-  }, [selectedCategory]);
+  }, [categories]);
 
   return (
     <motion.div

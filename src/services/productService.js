@@ -38,6 +38,11 @@ const productService = {
       console.error(error);
     }
   },
+
+  async createProduct(formData) {
+    const res = await axios.post("/api/product", formData);
+    return res.data;
+  },
 };
 
 export default productService;
