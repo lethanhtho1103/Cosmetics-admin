@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import productService from "../../services/productService";
 import { toast } from "react-toastify";
+import ProductContext from "../../contexts/ProductContext";
 
-const AddProductModal = ({ isOpen, onClose, categories }) => {
-  const [productData, setProductData] = useState({
+const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
+  const { categories, modalOpenAdd, modalOpenEdit, closeModal, product } =
+    useContext(ProductContext);
+  const initialProductData = {
     name: "",
     price: "",
     quantity: "",
@@ -13,11 +16,10 @@ const AddProductModal = ({ isOpen, onClose, categories }) => {
     expiry: "",
     image: null,
     description: "",
-  });
-
+  };
+  const [productData, setProductData] = useState(initialProductData);
   const [errors, setErrors] = useState({});
 
-  // Validation logic for required fields
   const validate = () => {
     const newErrors = {};
     if (!productData.name) newErrors.name = "Tên sản phẩm là bắt buộc";
@@ -31,12 +33,12 @@ const AddProductModal = ({ isOpen, onClose, categories }) => {
       newErrors.category_id = "Danh mục là bắt buộc";
     if (!productData.expiry || productData.expiry <= 0)
       newErrors.expiry = "Hạn sử dụng phải lớn hơn 0";
-    if (!productData.image) newErrors.image = "Hình ảnh là bắt buộc";
+    if (!productData.image && !product)
+      newErrors.image = "Hình ảnh là bắt buộc";
 
     return newErrors;
   };
 
-  // Handle input and file changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setProductData({
@@ -55,7 +57,6 @@ const AddProductModal = ({ isOpen, onClose, categories }) => {
       setErrors(validationErrors);
       return;
     }
-
     const formData = new FormData();
     formData.append("name", productData.name);
     formData.append("price", productData.price);
@@ -65,202 +66,314 @@ const AddProductModal = ({ isOpen, onClose, categories }) => {
     formData.append("category_id", productData.category_id);
     formData.append("expiry", productData.expiry);
     formData.append("description", productData.description);
-    if (productData.image) {
+    if (productData.image && typeof productData.image !== "string") {
       formData.append("image", productData.image);
     }
 
     try {
-      const res = await productService.createProduct(formData);
-      toast.success(res.message);
-      onClose(); // Close modal
+      let res;
+      if (modalOpenAdd) {
+        res = await productService.createProduct(formData);
+        toast.success(res.message);
+      } else if (modalOpenEdit) {
+        res = await productService.updateProduct(product._id, formData);
+        toast.success(res.message);
+      }
+      handleGetAllProducts(selectedCategory);
+      handleCloseModal(false);
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi thêm sản phẩm.");
+      toast.error("Có lỗi xảy ra khi xử lý sản phẩm.");
     }
   };
 
-  if (!isOpen) return null;
+  const handleCloseModal = () => {
+    closeModal();
+    setErrors({});
+  };
+
+  useEffect(() => {
+    if (!product) {
+      setProductData(initialProductData);
+    } else {
+      setProductData({
+        name: product.name || "",
+        price: product.price || "",
+        quantity: product.quantity || "",
+        trademark: product.trademark || "",
+        origin: product.origin || "",
+        category_id: product.category_id || "",
+        expiry: product.expiry || "",
+        image: product.image || null,
+        description: product.description || "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product]);
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-lg p-8 relative shadow-lg">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-          Thêm Sản Phẩm
-        </h2>
-        <div className="space-y-5">
-          {/* Row for Name and Price */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+    (modalOpenAdd || modalOpenEdit) && (
+      <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
+        <div className="bg-white rounded-lg w-full max-w-lg p-8 relative shadow-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+            {product ? "Chỉnh sửa Sản Phẩm" : "Thêm Sản Phẩm"}
+          </h2>
+          <div className="space-y-5">
+            <div className="relative">
               <input
+                id="name"
                 type="text"
                 name="name"
-                placeholder="Tên sản phẩm"
+                placeholder=" "
                 value={productData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 peer ${
                   errors.name ? "border-red-500" : "border-gray-300"
                 }`}
               />
+              <label
+                htmlFor="name"
+                className={`absolute left-2 transition-all ${
+                  productData.name
+                    ? "top-0 text-xs text-blue-500 bg-white"
+                    : "top-1/2 p-1 text-base"
+                } transform -translate-y-1/2 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
+              >
+                Tên sản phẩm
+              </label>
               {errors.name && (
                 <p className="text-red-500 text-sm mt-1">{errors.name}</p>
               )}
             </div>
 
-            <div>
-              <input
-                type="number"
-                name="price"
-                min={1}
-                placeholder="Giá"
-                value={productData.price}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                  errors.price ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-              {errors.price && (
-                <p className="text-red-500 text-sm mt-1">{errors.price}</p>
-              )}
-            </div>
-          </div>
+            {/* Row for Quantity and Expiry */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Input for Quantity */}
+              <div className="relative">
+                <input
+                  id="quantity"
+                  type="number"
+                  name="quantity"
+                  min={1}
+                  placeholder=" "
+                  value={productData.quantity}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 peer ${
+                    errors.quantity ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                <label
+                  htmlFor="quantity"
+                  className={`absolute left-2 transition-all ${
+                    productData.quantity
+                      ? "top-0 text-xs text-blue-500 bg-white"
+                      : "top-1/2 p-1 text-base"
+                  } transform -translate-y-1/2 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
+                >
+                  Số lượng
+                </label>
+                {errors.quantity && (
+                  <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>
+                )}
+              </div>
 
-          {/* Row for Quantity and Expiry */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <input
-                type="number"
-                name="quantity"
-                min={1}
-                placeholder="Số lượng"
-                value={productData.quantity}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                  errors.quantity ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-              {errors.quantity && (
-                <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>
-              )}
-            </div>
-
-            <div>
-              <input
-                type="number"
-                name="expiry"
-                min={1}
-                placeholder="Hạn sử dụng (tháng)"
-                value={productData.expiry}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                  errors.expiry ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-              {errors.expiry && (
-                <p className="text-red-500 text-sm mt-1">{errors.expiry}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Row for Trademark and Origin */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <input
-                type="text"
-                name="trademark"
-                placeholder="Thương hiệu"
-                value={productData.trademark}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                  errors.trademark ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-              {errors.trademark && (
-                <p className="text-red-500 text-sm mt-1">{errors.trademark}</p>
-              )}
+              {/* Input for Expiry */}
+              <div className="relative">
+                <input
+                  id="expiry"
+                  type="number"
+                  name="expiry"
+                  min={1}
+                  placeholder=" "
+                  value={productData.expiry}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 peer ${
+                    errors.expiry ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                <label
+                  htmlFor="expiry"
+                  className={`absolute left-2 transition-all ${
+                    productData.expiry
+                      ? "top-0 text-xs text-blue-500 bg-white"
+                      : "top-1/2 p-1 text-base"
+                  } transform -translate-y-1/2 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
+                >
+                  Hạn sử dụng (tháng)
+                </label>
+                {errors.expiry && (
+                  <p className="text-red-500 text-sm mt-1">{errors.expiry}</p>
+                )}
+              </div>
             </div>
 
-            <div>
-              <input
-                type="text"
-                name="origin"
-                placeholder="Xuất xứ"
-                value={productData.origin}
+            {/* Row for Trademark and Origin */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Input for Trademark */}
+              <div className="relative">
+                <input
+                  id="trademark"
+                  type="text"
+                  name="trademark"
+                  placeholder=" "
+                  value={productData.trademark}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 peer ${
+                    errors.trademark ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                <label
+                  htmlFor="trademark"
+                  className={`absolute left-2 transition-all ${
+                    productData.trademark
+                      ? "top-0 text-xs text-blue-500 bg-white"
+                      : "top-1/2 p-1 text-base"
+                  } transform -translate-y-1/2 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
+                >
+                  Thương hiệu
+                </label>
+                {errors.trademark && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.trademark}
+                  </p>
+                )}
+              </div>
+
+              {/* Input for Origin */}
+              <div className="relative">
+                <input
+                  id="origin"
+                  type="text"
+                  name="origin"
+                  placeholder=" "
+                  value={productData.origin}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 peer ${
+                    errors.origin ? "border-red-500" : "border-gray-300"
+                  }`}
+                />
+                <label
+                  htmlFor="origin"
+                  className={`absolute left-2 transition-all ${
+                    productData.origin
+                      ? "top-0 text-xs text-blue-500 bg-white"
+                      : "top-1/2 p-1 text-base"
+                  } transform -translate-y-1/2 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
+                >
+                  Xuất xứ
+                </label>
+                {errors.origin && (
+                  <p className="text-red-500 text-sm mt-1">{errors.origin}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Select for Category */}
+            <div className="relative">
+              <label
+                htmlFor="category_id"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Danh mục
+              </label>
+              <select
+                id="category_id"
+                name="category_id"
+                value={productData.category_id}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                  errors.origin ? "border-red-500" : "border-gray-300"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
+                  errors.category_id ? "border-red-500" : "border-gray-300"
                 }`}
-              />
-              {errors.origin && (
-                <p className="text-red-500 text-sm mt-1">{errors.origin}</p>
+              >
+                <option value="">Chọn danh mục</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              {errors.category_id && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.category_id}
+                </p>
               )}
             </div>
-          </div>
 
-          {/* Image Input */}
-          <div>
-            <input
-              type="file"
-              name="image"
-              onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                errors.image ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {errors.image && (
-              <p className="text-red-500 text-sm mt-1">{errors.image}</p>
-            )}
-          </div>
+            {/* Input for Image */}
+            <div className="relative">
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Hình ảnh
+              </label>
+              <input
+                id="image"
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleChange}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
+                  errors.image ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {errors.image && (
+                <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+              )}
+            </div>
 
-          <div>
-            <select
-              name="category_id"
-              value={productData.category_id}
-              onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                errors.category_id ? "border-red-500" : "border-gray-300"
-              }`}
-            >
-              <option value="" disabled>
-                Chọn danh mục
-              </option>
-              {categories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            {errors.category_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.category_id}</p>
-            )}
-          </div>
-
-          <div>
-            <textarea
-              name="description"
-              placeholder="Mô tả sản phẩm"
-              value={productData.description}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 border-gray-300"
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-between">
-            <button
-              onClick={onClose}
-              className="bg-black text-white px-4 py-2 rounded-lg"
-            >
-              Hủy
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-            >
-              Lưu
-            </button>
+            {/* Input for Description */}
+            <div className="relative">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Mô tả
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                rows="2"
+                placeholder=" "
+                value={productData.description}
+                onChange={handleChange}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 peer ${
+                  errors.description ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              <label
+                htmlFor="description"
+                className={`absolute left-2 transition-all ${
+                  productData.description
+                    ? "top-0 text-xs text-blue-500 bg-white"
+                    : "top-1/2 p-1 text-base"
+                } transform -translate-y-1/2 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
+              >
+                Mô tả
+              </label>
+              {errors.description && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.description}
+                </p>
+              )}
+            </div>
+            <div className="flex justify-end space-x-4">
+              <button
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                onClick={handleCloseModal}
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-300"
+              >
+                {modalOpenAdd ? "Thêm Sản Phẩm" : "Lưu Thay Đổi"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    )
   );
 };
 

@@ -40,8 +40,21 @@ const productService = {
   },
 
   async createProduct(formData) {
-    const res = await axios.post("/api/product", formData);
-    return res.data;
+    try {
+      const res = await axios.post("/api/product", formData);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  async updateProduct(productId, formData) {
+    try {
+      const res = await axios.put(`/api/product/${productId}`, formData);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
   },
 
   async deleteProduct(productId) {
