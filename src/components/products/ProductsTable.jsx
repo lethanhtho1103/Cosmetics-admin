@@ -317,7 +317,6 @@ const ProductsTable = () => {
             </button>
           </div>
         </div>
-
         <ConfirmDeleteModal
           isOpen={isModalOpen}
           onClose={closeDeleteModal}

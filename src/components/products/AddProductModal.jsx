@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import productService from "../../services/productService";
 import { toast } from "react-toastify";
 import ProductContext from "../../contexts/ProductContext";
+import Select from "react-select";
 
 const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
   const { categories, modalOpenAdd, modalOpenEdit, closeModal, product } =
@@ -88,6 +89,7 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
 
   const handleCloseModal = () => {
     closeModal();
+    setProductData(initialProductData);
     setErrors({});
   };
 
@@ -132,9 +134,9 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
               />
               <label
                 htmlFor="name"
-                className={`absolute left-2 transition-all ${
+                className={`absolute left-2  ${
                   productData.name
-                    ? "top-0 text-xs text-blue-500 bg-white"
+                    ? "top-0 text-xs text-blue-500 bg-white px-1"
                     : "top-1/2 p-1 text-base"
                 } transform -translate-y-1/2 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
               >
@@ -163,7 +165,7 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
                 />
                 <label
                   htmlFor="quantity"
-                  className={`absolute left-2 transition-all ${
+                  className={`absolute left-2 px-1 ${
                     productData.quantity
                       ? "top-0 text-xs text-blue-500 bg-white"
                       : "top-1/2 p-1 text-base"
@@ -192,7 +194,7 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
                 />
                 <label
                   htmlFor="expiry"
-                  className={`absolute left-2 transition-all ${
+                  className={`absolute left-2 px-1 ${
                     productData.expiry
                       ? "top-0 text-xs text-blue-500 bg-white"
                       : "top-1/2 p-1 text-base"
@@ -223,7 +225,7 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
                 />
                 <label
                   htmlFor="trademark"
-                  className={`absolute left-2 transition-all ${
+                  className={`absolute left-2 px-1 ${
                     productData.trademark
                       ? "top-0 text-xs text-blue-500 bg-white"
                       : "top-1/2 p-1 text-base"
@@ -253,7 +255,7 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
                 />
                 <label
                   htmlFor="origin"
-                  className={`absolute left-2 transition-all ${
+                  className={`absolute left-2 px-1 ${
                     productData.origin
                       ? "top-0 text-xs text-blue-500 bg-white"
                       : "top-1/2 p-1 text-base"
@@ -275,22 +277,27 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
               >
                 Danh mục
               </label>
-              <select
+              <Select
                 id="category_id"
                 name="category_id"
-                value={productData.category_id}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
+                value={categories.find(
+                  (category) => category._id === productData.category_id
+                )}
+                onChange={(selectedOption) =>
+                  handleChange({
+                    target: { name: "category_id", value: selectedOption._id },
+                  })
+                }
+                options={categories.map((category) => ({
+                  value: category._id,
+                  label: category.name,
+                }))}
+                classNamePrefix="react-select"
+                className={`w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
                   errors.category_id ? "border-red-500" : "border-gray-300"
                 }`}
-              >
-                <option value="">Chọn danh mục</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+                placeholder="Chọn danh mục"
+              />
               {errors.category_id && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.category_id}
@@ -298,7 +305,6 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
               )}
             </div>
 
-            {/* Input for Image */}
             <div className="relative">
               <label
                 htmlFor="image"
@@ -321,14 +327,7 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
               )}
             </div>
 
-            {/* Input for Description */}
             <div className="relative">
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Mô tả
-              </label>
               <textarea
                 id="description"
                 name="description"
@@ -342,11 +341,11 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
               />
               <label
                 htmlFor="description"
-                className={`absolute left-2 transition-all ${
+                className={`absolute left-2 px-1 transition-all ${
                   productData.description
-                    ? "top-0 text-xs text-blue-500 bg-white"
-                    : "top-1/2 p-1 text-base"
-                } transform -translate-y-1/2 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
+                    ? "top-1 text-xs text-blue-500 bg-white"
+                    : "top-1/2 text-base"
+                } transform -translate-y-4 text-gray-500 peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-1 peer-focus:bg-white peer-focus:text-blue-500 peer-focus:text-xs`}
               >
                 Mô tả
               </label>
@@ -356,6 +355,7 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
                 </p>
               )}
             </div>
+
             <div className="flex justify-end space-x-4">
               <button
                 className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
