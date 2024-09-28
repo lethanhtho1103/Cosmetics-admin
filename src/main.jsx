@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import { BrowserRouter } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { ProductProvider } from "./contexts/ProductContext.jsx";
+import { OrderProvider } from "./contexts/OrderContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -16,9 +17,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <ToastContainer />
-          <ProductProvider>
-            <App />
-          </ProductProvider>
+          <OrderProvider>
+            <ProductProvider>
+              <App />
+            </ProductProvider>
+          </OrderProvider>
         </PersistGate>
       </Provider>
     </BrowserRouter>

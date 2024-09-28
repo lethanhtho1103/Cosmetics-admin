@@ -16,10 +16,8 @@ function App() {
     <Routes>
       {!isAdmin ? (
         <>
-          {/* Login page outside the main layout */}
           <Route path="/login" element={<LoginAdmin />} />
           <Route path="*" element={<Navigate to="/login" />} />{" "}
-          {/* Redirect to login if not admin */}
         </>
       ) : (
         <Route
