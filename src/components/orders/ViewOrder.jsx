@@ -6,16 +6,16 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import CloseIcon from "@mui/icons-material/Close"; // Import CloseIcon
-import Dialog from "@mui/material/Dialog"; // Import Dialog
-import DialogContent from "@mui/material/DialogContent"; // Import DialogContent
+import CloseIcon from "@mui/icons-material/Close";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
 import orderService from "../../services/orderService";
 import { baseUrl } from "../../axios";
 import { toast } from "react-toastify";
 
-function ViewOrder({ orderId, formatDate, handleCancelViewOrder }) {
+function ViewOrder({ orderId, formatDate, onClose }) {
   const [order, setOrder] = useState({});
-  const [selectedStatus, setSelectedStatus] = useState("denied"); // Default value
+  const [selectedStatus, setSelectedStatus] = useState("denied");
 
   const formatNumber = (num) =>
     num?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -37,7 +37,7 @@ function ViewOrder({ orderId, formatDate, handleCancelViewOrder }) {
   };
 
   return (
-    <Dialog open={true} onClose={handleCancelViewOrder} fullWidth maxWidth="md">
+    <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
       <DialogContent>
         <Box sx={{ padding: "20px" }}>
           <Card
@@ -46,10 +46,10 @@ function ViewOrder({ orderId, formatDate, handleCancelViewOrder }) {
             key={order._id}
           >
             <Button
-              onClick={handleCancelViewOrder}
+              onClick={onClose}
               sx={{
                 position: "absolute",
-                top: "8px", // Adjust position to be closer to the top
+                top: "8px",
                 right: "10px",
                 zIndex: 1,
                 backgroundColor: "transparent",
@@ -143,10 +143,10 @@ function ViewOrder({ orderId, formatDate, handleCancelViewOrder }) {
                       border: "1px solid #ccc",
                     }}
                   >
-                    <option value="pending">Chờ xác nhận</option>
-                    <option value="accepted">Chờ giao hàng</option>
+                    {/* <option value="pending">Chờ xác nhận</option> */}
+                    <option value="shipped">Đang vận chuyển</option>
                     <option value="delivered">Hoàn thành</option>
-                    <option value="denied">Đã hủy</option>
+                    <option value="denied">Hủy đơn</option>
                   </select>
                   <Button
                     variant="contained"

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Eye, Check } from "lucide-react";
+import { Search, Eye, ChevronUp, ChevronDown } from "lucide-react";
 import OrderContext from "../../contexts/OrderContext";
 import ViewOrder from "./ViewOrder";
 
@@ -9,6 +9,7 @@ const OrdersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [orderId, setOrderId] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
 
   const handleShowViewOrder = (id) => {
     setOrderId(id);
@@ -28,16 +29,30 @@ const OrdersTable = () => {
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-
     const filtered = orders.filter((order) => {
-      const username = order.user_id?.username
+      const username = order?.user_id?.username
         ? order.user_id.username.toLowerCase()
         : "";
-      const orderStatus = order.status ? order.status.toLowerCase() : "";
+      const orderStatus =
+        order.status === "delivered"
+          ? "đã giao"
+          : order.status === "pending"
+          ? "đang chờ xử lý"
+          : order.status === "shipped"
+          ? "đang vận chuyển"
+          : "đã hủy";
 
-      return username.includes(term) || orderStatus.includes(term);
+      const totalPrice = handleTotalPriceOrder(order?.orderDetails)
+        .toString()
+        .toLowerCase();
+      const orderDate = formatDate(order?.order_date).toLowerCase();
+      return (
+        username.includes(term) ||
+        orderStatus.includes(term) ||
+        totalPrice.includes(term) ||
+        orderDate.includes(term)
+      );
     });
-
     setFilteredOrders(filtered);
   };
 
@@ -49,8 +64,38 @@ const OrdersTable = () => {
     return `${month}/${day}/${year}`;
   };
 
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+    const sortedOrders = [...filteredOrders].sort((a, b) => {
+      if (key === "username") {
+        const nameA = a.user_id.username.toLowerCase();
+        const nameB = b.user_id.username.toLowerCase();
+        return direction === "asc"
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
+      } else if (key === "totalPrice") {
+        const totalA = handleTotalPriceOrder(a.orderDetails);
+        const totalB = handleTotalPriceOrder(b.orderDetails);
+        return direction === "asc" ? totalA - totalB : totalB - totalA;
+      } else if (key === "status") {
+        return direction === "asc"
+          ? a.status.localeCompare(b.status)
+          : b.status.localeCompare(a.status);
+      } else if (key === "orderDate") {
+        const dateA = new Date(a.order_date);
+        const dateB = new Date(b.order_date);
+        return direction === "asc" ? dateA - dateB : dateB - dateA;
+      }
+      return 0;
+    });
+    setFilteredOrders(sortedOrders);
+  };
+
   useEffect(() => {
-    // Update filteredOrders whenever orders change
     setFilteredOrders(orders);
   }, [orders]);
 
@@ -83,20 +128,76 @@ const OrdersTable = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 STT
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Tên
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("username")}
+              >
+                <div className="flex items-center">
+                  Tên
+                  {sortConfig.key === "username" && (
+                    <span className="ml-2 text-blue-400">
+                      {sortConfig.direction === "asc" ? (
+                        <ChevronUp />
+                      ) : (
+                        <ChevronDown />
+                      )}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Tổng tiền
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("totalPrice")}
+              >
+                <div className="flex items-center">
+                  Tổng tiền
+                  {sortConfig.key === "totalPrice" && (
+                    <span className="ml-2 text-blue-400">
+                      {sortConfig.direction === "asc" ? (
+                        <ChevronUp />
+                      ) : (
+                        <ChevronDown />
+                      )}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Trạng thái
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("status")}
+              >
+                <div className="flex items-center">
+                  Trạng thái
+                  {sortConfig.key === "status" && (
+                    <span className="ml-2 text-blue-400">
+                      {sortConfig.direction === "asc" ? (
+                        <ChevronUp />
+                      ) : (
+                        <ChevronDown />
+                      )}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Ngày đặt
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("orderDate")}
+              >
+                <div className="flex items-center">
+                  Ngày đặt
+                  {sortConfig.key === "orderDate" && (
+                    <span className="ml-2 text-blue-400">
+                      {sortConfig.direction === "asc" ? (
+                        <ChevronUp />
+                      ) : (
+                        <ChevronDown />
+                      )}
+                    </span>
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Hàng động
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                Hành động
               </th>
             </tr>
           </thead>
@@ -121,31 +222,32 @@ const OrdersTable = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      order.status === "Delivered"
+                      order.status === "delivered"
                         ? "bg-green-100 text-green-800"
-                        : order.status === "Processing"
+                        : order.status === "pending"
                         ? "bg-yellow-100 text-yellow-800"
-                        : order.status === "Shipped"
+                        : order.status === "shipped"
                         ? "bg-blue-100 text-blue-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {order?.status}
+                    {order.status === "delivered"
+                      ? "Đã giao"
+                      : order.status === "pending"
+                      ? "Đang chờ xử lý"
+                      : order.status === "shipped"
+                      ? "Đang vận chuyển"
+                      : "Đã hủy"}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {formatDate(order?.order_date)}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                  {formatDate(order.order_date)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap d-flex justify-center text-sm text-gray-300">
-                  <button
-                    className="text-indigo-400 hover:text-indigo-300 mr-2"
-                    onClick={() => handleShowViewOrder(order?._id)}
-                  >
-                    <Eye size={18} />
-                  </button>
-                  <button className="text-green-400 hover:text-green-300">
-                    <Check size={18} />
-                  </button>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100 text-center flex justify-center">
+                  <Eye
+                    className="cursor-pointer text-blue-500 hover:text-blue-700"
+                    onClick={() => handleShowViewOrder(order._id)}
+                  />
                 </td>
               </motion.tr>
             ))}
@@ -156,10 +258,11 @@ const OrdersTable = () => {
         <ViewOrder
           orderId={orderId}
           formatDate={formatDate}
-          handleCancelViewOrder={handleCancelViewOrder}
+          onClose={handleCancelViewOrder}
         />
       )}
     </motion.div>
   );
 };
+
 export default OrdersTable;
