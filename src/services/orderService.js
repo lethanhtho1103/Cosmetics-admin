@@ -10,14 +10,15 @@ const orderService = {
     }
   },
 
-  async getOrderById(userId) {
+  async getOrderById(orderId) {
     try {
-      const res = await axios.get(`/api/order/user/${userId}`);
+      const res = await axios.get(`/api/order/${orderId}`);
       return res?.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || "Thất bại");
     }
   },
+
   async updateStatus(orderId, status) {
     try {
       const response = await axios.put("/api/order/update/status", {

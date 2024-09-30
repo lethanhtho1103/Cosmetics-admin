@@ -1,74 +1,25 @@
 import { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Eye } from "lucide-react";
+import { Search, Eye, Check } from "lucide-react";
 import OrderContext from "../../contexts/OrderContext";
-
-const orderData = [
-  {
-    id: "ORD001",
-    customer: "John Doe",
-    total: 235.4,
-    status: "Delivered",
-    date: "2023-07-01",
-  },
-  {
-    id: "ORD002",
-    customer: "Jane Smith",
-    total: 412.0,
-    status: "Processing",
-    date: "2023-07-02",
-  },
-  {
-    id: "ORD003",
-    customer: "Bob Johnson",
-    total: 162.5,
-    status: "Shipped",
-    date: "2023-07-03",
-  },
-  {
-    id: "ORD004",
-    customer: "Alice Brown",
-    total: 750.2,
-    status: "Pending",
-    date: "2023-07-04",
-  },
-  {
-    id: "ORD005",
-    customer: "Charlie Wilson",
-    total: 95.8,
-    status: "Delivered",
-    date: "2023-07-05",
-  },
-  {
-    id: "ORD006",
-    customer: "Eva Martinez",
-    total: 310.75,
-    status: "Processing",
-    date: "2023-07-06",
-  },
-  {
-    id: "ORD007",
-    customer: "David Lee",
-    total: 528.9,
-    status: "Shipped",
-    date: "2023-07-07",
-  },
-  {
-    id: "ORD008",
-    customer: "Grace Taylor",
-    total: 189.6,
-    status: "Delivered",
-    date: "2023-07-08",
-  },
-];
+import ViewOrder from "./ViewOrder";
 
 const OrdersTable = () => {
   const { orders } = useContext(OrderContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
+  const [orderId, setOrderId] = useState("");
+
+  const handleShowViewOrder = (id) => {
+    setOrderId(id);
+  };
+
+  const handleCancelViewOrder = () => {
+    setOrderId("");
+  };
 
   const handleTotalPriceOrder = (order) => {
-    const result = order.reduce((total, currentItem) => {
+    const result = order?.reduce((total, currentItem) => {
       return total + currentItem?.unit_price * currentItem?.quantity;
     }, 0);
     return result;
@@ -77,21 +28,24 @@ const OrdersTable = () => {
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    const filtered = orderData.filter(
-      (order) =>
-        order.id.toLowerCase().includes(term) ||
-        order.customer.toLowerCase().includes(term)
-    );
+
+    const filtered = orders.filter((order) => {
+      const username = order.user_id?.username
+        ? order.user_id.username.toLowerCase()
+        : "";
+      const orderStatus = order.status ? order.status.toLowerCase() : "";
+
+      return username.includes(term) || orderStatus.includes(term);
+    });
+
     setFilteredOrders(filtered);
   };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-
-    const month = date.getMonth() + 1; // Tháng trong JS bắt đầu từ 0
+    const month = date.getMonth() + 1;
     const day = date.getDate();
     const year = date.getFullYear();
-
     return `${month}/${day}/${year}`;
   };
 
@@ -109,7 +63,7 @@ const OrdersTable = () => {
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-100">
-          Damh Sách Đơn Hàng
+          Danh Sách Đơn Hàng
         </h2>
         <div className="relative">
           <input
@@ -122,7 +76,6 @@ const OrdersTable = () => {
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
         </div>
       </div>
-
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
           <thead>
@@ -160,7 +113,7 @@ const OrdersTable = () => {
                   {index + 1}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                  {order.user_id.username}
+                  {order?.user_id?.username}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
                   ${handleTotalPriceOrder(order?.orderDetails)}
@@ -183,9 +136,15 @@ const OrdersTable = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {formatDate(order?.order_date)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  <button className="text-indigo-400 hover:text-indigo-300 mr-2">
+                <td className="px-6 py-4 whitespace-nowrap d-flex justify-center text-sm text-gray-300">
+                  <button
+                    className="text-indigo-400 hover:text-indigo-300 mr-2"
+                    onClick={() => handleShowViewOrder(order?._id)}
+                  >
                     <Eye size={18} />
+                  </button>
+                  <button className="text-green-400 hover:text-green-300">
+                    <Check size={18} />
                   </button>
                 </td>
               </motion.tr>
@@ -193,6 +152,13 @@ const OrdersTable = () => {
           </tbody>
         </table>
       </div>
+      {orderId && (
+        <ViewOrder
+          orderId={orderId}
+          formatDate={formatDate}
+          handleCancelViewOrder={handleCancelViewOrder}
+        />
+      )}
     </motion.div>
   );
 };
