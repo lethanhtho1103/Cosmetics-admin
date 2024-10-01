@@ -5,7 +5,7 @@ import productService from "../../services/productService";
 import { baseUrl } from "../../axios";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
-import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import ProductContext from "../../contexts/ProductContext";
 import AddProductModal from "./AddProductModal";
 
@@ -136,7 +136,7 @@ const ProductsTable = () => {
     if (categories && categories.length > 0) {
       const initialCategory = categories[0]?.name;
       setSelectedCategory(initialCategory);
-      handleGetAllProducts(initialCategory); // Trigger fetch when component mounts with initial category.
+      handleGetAllProducts(initialCategory);
     }
   }, [categories]);
 

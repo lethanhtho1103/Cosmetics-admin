@@ -6,8 +6,15 @@ import UsersPage from "./pages/UsersPage";
 import SalesPage from "./pages/SalesPage";
 import OrdersPage from "./pages/OrdersPage";
 import SettingsPage from "./pages/SettingsPage";
+import Category1Page from "./pages/Category1Page";
+import Category2Page from "./pages/Category2Page";
+import Category3Page from "./pages/Category3Page";
+
 import LoginAdmin from "./pages/LoginPage";
 import { useSelector } from "react-redux";
+import { OrderProvider } from "./contexts/OrderContext";
+import { ProductProvider } from "./contexts/ProductContext";
+import { CategoryProvider } from "./contexts/CategoryContext";
 
 function App() {
   const isAdmin = useSelector((state) => state.auth.login?.currentAdmin?.admin);
@@ -33,13 +40,36 @@ function App() {
               <Sidebar />
               <Routes>
                 <Route path="/" element={<OverviewPage />} />
-                <Route path="/products" element={<ProductsPage />} />
+                <Route
+                  path="/products"
+                  element={
+                    <ProductProvider>
+                      <ProductsPage />
+                    </ProductProvider>
+                  }
+                />
+                <Route
+                  path="/products/category1"
+                  element={
+                    <CategoryProvider>
+                      <Category1Page />
+                    </CategoryProvider>
+                  }
+                />
+                <Route path="/products/category2" element={<Category2Page />} />
+                <Route path="/products/category3" element={<Category3Page />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/sales" element={<SalesPage />} />
-                <Route path="/orders" element={<OrdersPage />} />
+                <Route
+                  path="/orders"
+                  element={
+                    <OrderProvider>
+                      <OrdersPage />
+                    </OrderProvider>
+                  }
+                />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="*" element={<Navigate to="/" />} />{" "}
-                {/* Redirect unknown paths */}
               </Routes>
             </div>
           }

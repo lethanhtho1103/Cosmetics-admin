@@ -8,8 +8,6 @@ import { persistor, store } from "./redux/store.js";
 import { ToastContainer } from "react-toastify";
 import { BrowserRouter } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { ProductProvider } from "./contexts/ProductContext.jsx";
-import { OrderProvider } from "./contexts/OrderContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -17,11 +15,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <ToastContainer />
-          <OrderProvider>
-            <ProductProvider>
-              <App />
-            </ProductProvider>
-          </OrderProvider>
+          <App />
         </PersistGate>
       </Provider>
     </BrowserRouter>

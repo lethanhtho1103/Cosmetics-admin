@@ -6,6 +6,8 @@ import {
   ShoppingBag,
   ShoppingCart,
   Users,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -18,7 +20,26 @@ const SIDEBAR_ITEMS = [
     color: "#6366f1",
     href: "/",
   },
-  { name: "Sản Phẩm", icon: ShoppingBag, color: "#8B5CF6", href: "/products" },
+  {
+    name: "Sản Phẩm",
+    icon: ShoppingBag,
+    color: "#8B5CF6",
+    href: "/products",
+    subItems: [
+      {
+        name: "Danh Mục Cấp 1",
+        href: "/products/category1",
+      },
+      {
+        name: "Danh Mục Cấp 2",
+        href: "/products/category2",
+      },
+      {
+        name: "Danh Mục Cấp 3",
+        href: "/products/category3",
+      },
+    ],
+  },
   { name: "Người Dùng", icon: Users, color: "#EC4899", href: "/users" },
   { name: "Doanh Số", icon: DollarSign, color: "#10B981", href: "/sales" },
   { name: "Đơn Hàng", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
@@ -27,6 +48,7 @@ const SIDEBAR_ITEMS = [
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [openSubMenu, setOpenSubMenu] = useState(null);
   const location = useLocation(); // Lấy URL hiện tại
 
   return (
@@ -48,35 +70,87 @@ const Sidebar = () => {
 
         <nav className="mt-8 flex-grow">
           {SIDEBAR_ITEMS.map((item) => {
-            // Kiểm tra xem đường dẫn hiện tại có khớp với href của item không
             const isActive = location.pathname === item.href;
 
             return (
-              <Link key={item.href} to={item.href}>
-                <motion.div
-                  className={`flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2 ${
-                    isActive ? "text-red-500" : "text-white"
-                  }`}
+              <div key={item.href}>
+                <Link
+                  to={item.href}
+                  onClick={() =>
+                    setOpenSubMenu(
+                      item.name === "Sản Phẩm"
+                        ? openSubMenu === item.name
+                          ? null
+                          : item.name
+                        : null
+                    )
+                  }
                 >
-                  <item.icon
-                    size={20}
-                    style={{ color: item.color, minWidth: "20px" }}
-                  />
-                  <AnimatePresence>
-                    {isSidebarOpen && (
-                      <motion.span
-                        className="ml-4 whitespace-nowrap"
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: "auto" }}
-                        exit={{ opacity: 0, width: 0 }}
-                        transition={{ duration: 0.2, delay: 0.3 }}
-                      >
-                        {item.name}
-                      </motion.span>
+                  <motion.div
+                    className={`flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2 ${
+                      isActive ? "text-red-500" : "text-white"
+                    }`}
+                  >
+                    <item.icon
+                      size={20}
+                      style={{ color: item.color, minWidth: "20px" }}
+                    />
+                    <AnimatePresence>
+                      {isSidebarOpen && (
+                        <motion.span
+                          className="ml-4 whitespace-nowrap flex-grow"
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: "auto" }}
+                          exit={{ opacity: 0, width: 0 }}
+                          transition={{ duration: 0.2, delay: 0.3 }}
+                        >
+                          {item.name}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                    {/* Dropdown arrow */}
+                    {item.subItems && (
+                      <span className="ml-2">
+                        {openSubMenu === "Sản Phẩm" ? (
+                          <ChevronUp size={16} />
+                        ) : (
+                          <ChevronDown size={16} />
+                        )}
+                      </span>
                     )}
-                  </AnimatePresence>
-                </motion.div>
-              </Link>
+                  </motion.div>
+                </Link>
+                {/* Render sub-items if the item is "Sản Phẩm" and the submenu is open */}
+                {item.subItems && openSubMenu === "Sản Phẩm" && (
+                  <div className="ml-6">
+                    {item.subItems.map((subItem) => (
+                      <Link key={subItem.href} to={subItem.href}>
+                        <motion.div
+                          className={`flex items-center p-2 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-1 ${
+                            location.pathname === subItem.href
+                              ? "text-red-500"
+                              : "text-white"
+                          }`}
+                        >
+                          <AnimatePresence>
+                            {isSidebarOpen && (
+                              <motion.span
+                                className="ml-2 whitespace-nowrap"
+                                initial={{ opacity: 0, width: 0 }}
+                                animate={{ opacity: 1, width: "auto" }}
+                                exit={{ opacity: 0, width: 0 }}
+                                transition={{ duration: 0.2, delay: 0.3 }}
+                              >
+                                {subItem.name}
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
