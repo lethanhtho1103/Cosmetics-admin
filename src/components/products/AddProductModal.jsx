@@ -112,6 +112,8 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product]);
 
+  console.log(productData.category_id);
+
   return (
     (modalOpenAdd || modalOpenEdit) && (
       <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
@@ -240,7 +242,6 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
                 )}
               </div>
 
-              {/* Input for Origin */}
               <div className="relative">
                 <input
                   id="origin"
@@ -268,8 +269,6 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
                 )}
               </div>
             </div>
-
-            {/* Select for Category */}
             <div className="relative">
               <label
                 htmlFor="category_id"
@@ -280,12 +279,20 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
               <Select
                 id="category_id"
                 name="category_id"
-                value={categories.find(
-                  (category) => category._id === productData.category_id
-                )}
+                value={
+                  categories
+                    .map((category) => ({
+                      value: category._id,
+                      label: category.name,
+                    }))
+                    .find(
+                      (option) => option.value === productData.category_id
+                    ) || null
+                }
                 onChange={(selectedOption) =>
-                  handleChange({
-                    target: { name: "category_id", value: selectedOption._id },
+                  setProductData({
+                    ...productData,
+                    category_id: selectedOption ? selectedOption.value : "",
                   })
                 }
                 options={categories.map((category) => ({

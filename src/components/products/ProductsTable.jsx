@@ -169,7 +169,6 @@ const ProductsTable = () => {
               ))}
             </select>
           </div>
-          {/* Search Input */}
           <div className="relative">
             <input
               type="text"
