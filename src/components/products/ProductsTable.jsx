@@ -8,6 +8,8 @@ import { toast } from "react-toastify";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import ProductContext from "../../contexts/ProductContext";
 import AddProductModal from "./AddProductModal";
+import Pagination from "../common/Pagination";
+import Select from "react-select";
 
 const ProductsTable = () => {
   const { handleShowEditProduct, categories } = useContext(ProductContext);
@@ -29,6 +31,15 @@ const ProductsTable = () => {
   );
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
+  // Function to sort products
+  const handleSort = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+  };
+
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
@@ -48,15 +59,6 @@ const ProductsTable = () => {
       });
       setFilteredProducts(filtered);
     }
-  };
-
-  // Function to sort products
-  const handleSort = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
-    }
-    setSortConfig({ key, direction });
   };
 
   const sortedProducts = useMemo(() => {
@@ -94,8 +96,8 @@ const ProductsTable = () => {
     }
   };
 
-  const handleCategoryChange = (e) => {
-    const selected = e.target.value;
+  const handleCategoryChange = (selectedOption) => {
+    const selected = selectedOption?.value;
     setSelectedCategory(selected);
     handleGetAllProducts(selected);
   };
@@ -132,13 +134,21 @@ const ProductsTable = () => {
   };
 
   useEffect(() => {
-    // Fetch products when the component mounts, or when `selectedCategory` changes.
     if (categories && categories.length > 0) {
       const initialCategory = categories[0]?.name;
       setSelectedCategory(initialCategory);
       handleGetAllProducts(initialCategory);
     }
   }, [categories]);
+
+  const selectOptions = useMemo(
+    () =>
+      categories?.map((category) => ({
+        value: category.name,
+        label: category.name,
+      })),
+    [categories]
+  );
 
   return (
     <>
@@ -156,18 +166,48 @@ const ProductsTable = () => {
           <h2 className="text-xl font-semibold text-gray-100">
             Danh sách sản phẩm
           </h2>
-          <div className="relative mr-4">
-            <select
-              className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-3 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={selectedCategory}
+          <div className="relative mr-4 w-60">
+            <Select
+              className="text-gray-700"
+              options={selectOptions}
+              value={selectOptions?.find(
+                (option) => option.value === selectedCategory
+              )}
               onChange={handleCategoryChange}
-            >
-              {categories?.map((category) => (
-                <option key={category._id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              placeholder="Chọn danh mục..."
+              isSearchable
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#2d3748",
+                  color: "white",
+                }),
+                singleValue: (provided) => ({
+                  ...provided,
+                  color: "white",
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#2d3748",
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isSelected ? "#4a5568" : "#2d3748",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#4a5568",
+                  },
+                }),
+                placeholder: (provided) => ({
+                  ...provided,
+                  color: "#a0aec0",
+                }),
+                input: (provided) => ({
+                  ...provided,
+                  color: "white",
+                }),
+              }}
+            />
           </div>
           <div className="relative">
             <input
@@ -272,50 +312,14 @@ const ProductsTable = () => {
             </tbody>
           </table>
         </div>
-        <div className="flex justify-between items-center mt-4">
-          <div className="flex items-center">
-            <span className="text-gray-400 mr-2">Hiển thị</span>
-            <select
-              className="bg-gray-700 text-white py-2 px-4 rounded"
-              value={itemsPerPage}
-              onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
-            >
-              {[5, 10, 15, 20].map((num) => (
-                <option key={num} value={num}>
-                  {num}/{filteredProducts.length}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex justify-center items-center">
-            <button
-              className={`bg-gray-600 text-white py-2 px-4 rounded mr-2 ${
-                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Trước
-            </button>
-            <span className="text-gray-400">
-              Trang {currentPage} / {totalPages}
-            </span>
-            <button
-              className={`bg-gray-600 text-white py-2 px-4 rounded ml-2 ${
-                currentPage === totalPages
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }`}
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Tiếp
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
+          filteredCategoriesLength={filteredProducts?.length}
+        />
         <ConfirmDeleteModal
           isOpen={isModalOpen}
           onClose={closeDeleteModal}

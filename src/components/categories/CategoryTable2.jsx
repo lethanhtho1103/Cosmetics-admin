@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import CategoryContext from "../../contexts/CategoryContext";
 import AddCategoryModal from "./AddCategoryModal";
+import Pagination from "../common/Pagination";
 import categoryService from "../../services/categoryService";
 import Select from "react-select";
 
@@ -192,120 +193,69 @@ const TableCategory2 = () => {
               onChange={handleSearch}
               value={searchTerm}
             />
-            <Search
-              className="absolute left-3 top-2.5 text-gray-400"
-              size={18}
-            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+              <Search className="text-gray-400 w-5 h-5" />
+            </div>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-700">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  STT
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+
+        <table className="min-w-full bg-gray-800 text-white">
+          <thead>
+            <tr>
+              <th className="py-3 px-4 text-left">
+                <div
+                  className="flex items-center cursor-pointer"
                   onClick={() => handleSort("name")}
                 >
-                  Tên
+                  Tên danh mục{" "}
                   {sortConfig.key === "name" &&
                     (sortConfig.direction === "ascending" ? (
-                      <ChevronUp className="inline ml-2 text-blue-400" />
+                      <ChevronUp className="ml-1 w-4 h-4" />
                     ) : (
-                      <ChevronDown className="inline ml-2 text-blue-400" />
+                      <ChevronDown className="ml-1 w-4 h-4" />
                     ))}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Hành động
-                </th>
+                </div>
+              </th>
+              <th className="py-3 px-4 text-left">Hành động</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-700">
+            {currentCategories.map((category) => (
+              <tr key={category._id}>
+                <td className="py-3 px-4">{category.name}</td>
+                <td className="py-3 px-4 flex">
+                  <button
+                    onClick={() => handleShowEditCategory2(category)}
+                    className="text-blue-500 hover:text-blue-700"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(category)}
+                    className="ml-3 text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700">
-              {currentCategories?.map((category, index) => (
-                <motion.tr
-                  key={category._id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {index + 1 + (currentPage - 1) * itemsPerPage}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {category.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 flex space-x-4">
-                    <button
-                      className="text-blue-400 hover:text-blue-500"
-                      onClick={() => handleShowEditCategory2(category?._id)}
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      className="text-red-400 hover:text-red-500"
-                      onClick={() => openDeleteModal(category)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-4">
-          <div className="flex items-center">
-            <span className="text-gray-400 mr-2">Hiển thị</span>
-            <select
-              className="bg-gray-700 text-white py-2 px-4 rounded"
-              value={itemsPerPage}
-              onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
-            >
-              {[5, 10, 15, 20].map((num) => (
-                <option key={num} value={num}>
-                  {num}/{filteredCategories?.length}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex justify-center items-center">
-            <button
-              className={`bg-gray-600 text-white py-2 px-4 rounded mr-2 ${
-                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Trước
-            </button>
-            <span className="text-gray-400">
-              Trang {currentPage} / {totalPages}
-            </span>
-            <button
-              className={`bg-gray-600 text-white py-2 px-4 rounded ml-2 ${
-                currentPage === totalPages
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }`}
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Tiếp
-            </button>
-          </div>
-        </div>
+            ))}
+          </tbody>
+        </table>
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          setCurrentPage={setCurrentPage}
+          filteredCategoriesLength={filteredCategories?.length}
+        />
       </motion.div>
+
       <ConfirmDeleteModal
         isOpen={isModalOpen}
         onClose={closeDeleteModal}
         onConfirm={confirmDelete}
-        title="Xóa danh mục"
-        message={`Bạn có chắc chắn muốn xóa danh mục ${categoryToDelete?.name}?`}
       />
     </>
   );
