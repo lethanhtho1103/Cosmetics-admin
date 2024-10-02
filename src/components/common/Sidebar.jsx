@@ -21,10 +21,9 @@ const SIDEBAR_ITEMS = [
     href: "/",
   },
   {
-    name: "Sản Phẩm",
+    name: "Danh Mục Sản Phẩm",
     icon: ShoppingBag,
     color: "#8B5CF6",
-    href: "/products",
     subItems: [
       {
         name: "Danh Mục Cấp 1",
@@ -38,6 +37,10 @@ const SIDEBAR_ITEMS = [
         name: "Danh Mục Cấp 3",
         href: "/products/category3",
       },
+      {
+        name: "Sản Phẩm",
+        href: "/products",
+      },
     ],
   },
   { name: "Người Dùng", icon: Users, color: "#EC4899", href: "/users" },
@@ -49,7 +52,11 @@ const SIDEBAR_ITEMS = [
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openSubMenu, setOpenSubMenu] = useState(null);
-  const location = useLocation(); // Lấy URL hiện tại
+  const location = useLocation();
+
+  const isSubItemActive = (subItems) => {
+    return subItems?.some((subItem) => location.pathname === subItem.href);
+  };
 
   return (
     <motion.div
@@ -70,7 +77,8 @@ const Sidebar = () => {
 
         <nav className="mt-8 flex-grow">
           {SIDEBAR_ITEMS.map((item) => {
-            const isActive = location.pathname === item.href;
+            const isActive =
+              location.pathname === item.href || isSubItemActive(item.subItems);
 
             return (
               <div key={item.href}>
@@ -78,7 +86,7 @@ const Sidebar = () => {
                   to={item.href}
                   onClick={() =>
                     setOpenSubMenu(
-                      item.name === "Sản Phẩm"
+                      item.name === "Danh Mục Sản Phẩm"
                         ? openSubMenu === item.name
                           ? null
                           : item.name
@@ -111,7 +119,7 @@ const Sidebar = () => {
                     {/* Dropdown arrow */}
                     {item.subItems && (
                       <span className="ml-2">
-                        {openSubMenu === "Sản Phẩm" ? (
+                        {openSubMenu === "Danh Mục Sản Phẩm" ? (
                           <ChevronUp size={16} />
                         ) : (
                           <ChevronDown size={16} />
@@ -120,8 +128,8 @@ const Sidebar = () => {
                     )}
                   </motion.div>
                 </Link>
-                {/* Render sub-items if the item is "Sản Phẩm" and the submenu is open */}
-                {item.subItems && openSubMenu === "Sản Phẩm" && (
+                {/* Render sub-items if the item is "Danh Mục Sản Phẩm" and the submenu is open */}
+                {item.subItems && openSubMenu === "Danh Mục Sản Phẩm" && (
                   <div className="ml-6">
                     {item.subItems.map((subItem) => (
                       <Link key={subItem.href} to={subItem.href}>
@@ -141,7 +149,8 @@ const Sidebar = () => {
                                 exit={{ opacity: 0, width: 0 }}
                                 transition={{ duration: 0.2, delay: 0.3 }}
                               >
-                                {subItem.name}
+                                • {subItem.name}{" "}
+                                {/* Add bullet before sub-item */}
                               </motion.span>
                             )}
                           </AnimatePresence>

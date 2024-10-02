@@ -9,7 +9,6 @@ import SettingsPage from "./pages/SettingsPage";
 import Category1Page from "./pages/Category1Page";
 import Category2Page from "./pages/Category2Page";
 import Category3Page from "./pages/Category3Page";
-
 import LoginAdmin from "./pages/LoginPage";
 import { useSelector } from "react-redux";
 import { OrderProvider } from "./contexts/OrderContext";
@@ -41,14 +40,6 @@ function App() {
               <Routes>
                 <Route path="/" element={<OverviewPage />} />
                 <Route
-                  path="/products"
-                  element={
-                    <ProductProvider>
-                      <ProductsPage />
-                    </ProductProvider>
-                  }
-                />
-                <Route
                   path="/products/category1"
                   element={
                     <CategoryProvider>
@@ -70,6 +61,14 @@ function App() {
                     <CategoryProvider>
                       <Category3Page />
                     </CategoryProvider>
+                  }
+                />
+                <Route
+                  path="/products"
+                  element={
+                    <ProductProvider>
+                      <ProductsPage />
+                    </ProductProvider>
                   }
                 />
                 <Route path="/users" element={<UsersPage />} />

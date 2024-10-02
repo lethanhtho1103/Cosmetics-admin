@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo, useCallback } from "react";
 import categoryService from "../../services/categoryService";
 import { toast } from "react-toastify";
 import CategoryContext from "../../contexts/CategoryContext";
@@ -23,31 +23,41 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
     handleGetAllCategories3,
   } = useContext(CategoryContext);
 
-  const isModalEdit =
-    modalOpenEditCategory1 || modalOpenEditCategory2 || modalOpenEditCategory3;
-  const isModalAdd =
-    modalOpenAddCategory1 || modalOpenAddCategory2 || modalOpenAddCategory3;
+  const isModalEdit = useMemo(
+    () =>
+      modalOpenEditCategory1 ||
+      modalOpenEditCategory2 ||
+      modalOpenEditCategory3,
+    [modalOpenEditCategory1, modalOpenEditCategory2, modalOpenEditCategory3]
+  );
+  const isModalAdd = useMemo(
+    () =>
+      modalOpenAddCategory1 || modalOpenAddCategory2 || modalOpenAddCategory3,
+    [modalOpenAddCategory1, modalOpenAddCategory2, modalOpenAddCategory3]
+  );
 
   const [name, setName] = useState("");
   const [category_id, setCategory_id] = useState("");
-
   const [errors, setErrors] = useState({});
 
-  const validate = () => {
+  const validate = useCallback(() => {
     const newErrors = {};
     if (!name) newErrors.name = "Tên danh mục là bắt buộc";
     return newErrors;
-  };
+  }, [name]);
 
-  const handleChange = (e) => {
-    const { value } = e.target;
-    setName(value);
-    if (errors.name) {
-      setErrors({ ...errors, name: null });
-    }
-  };
+  const handleChange = useCallback(
+    (e) => {
+      const { value } = e.target;
+      setName(value);
+      if (errors.name) {
+        setErrors({ ...errors, name: null });
+      }
+    },
+    [errors]
+  );
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -85,44 +95,57 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
     } catch (error) {
       toast.error("Có lỗi xảy ra khi xử lý danh mục.");
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    category1,
+    category2,
+    category3,
+    category_id,
+    handleGetAllCategories1,
+    handleGetAllCategories2,
+    handleGetAllCategories3,
+    modalOpenAddCategory1,
+    modalOpenAddCategory2,
+    modalOpenAddCategory3,
+    modalOpenEditCategory1,
+    modalOpenEditCategory2,
+    modalOpenEditCategory3,
+    name,
+    selectedCategory1,
+    selectedCategory2,
+    validate,
+  ]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     closeModal();
     setName("");
     setCategory_id("");
     setErrors({});
-  };
+  }, [closeModal]);
 
   useEffect(() => {
-    if (category1) {
-      setName(category1.name || "");
-    } else {
-      setName("");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (category1) setName(category1.name || "");
+    else setName("");
   }, [category1]);
 
   useEffect(() => {
     if (category2) {
       setName(category2.name || "");
-      setCategory_id(category2?.shop_id || "");
+      setCategory_id(category2.shop_id || "");
     } else {
       setName("");
       setCategory_id("");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category2]);
 
   useEffect(() => {
     if (category3) {
       setName(category3.name || "");
-      setCategory_id(category3?.cosmetic_id || "");
+      setCategory_id(category3.cosmetic_id || "");
     } else {
       setName("");
       setCategory_id("");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category3]);
 
   return (
@@ -134,70 +157,20 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
           </h2>
           <div className="space-y-5">
             {(modalOpenAddCategory2 || modalOpenEditCategory2) && (
-              <div>
-                <Select
-                  id="category_id"
-                  name="category_id"
-                  value={
-                    categories1
-                      .map((category) => ({
-                        value: category._id,
-                        label: category.name,
-                      }))
-                      .find((option) => option.value === category_id) || null
-                  }
-                  onChange={(selectedOption) =>
-                    setCategory_id(selectedOption ? selectedOption.value : "")
-                  }
-                  options={categories1.map((category) => ({
-                    value: category._id,
-                    label: category.name,
-                  }))}
-                  classNamePrefix="react-select"
-                  className={`w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                    errors.category_id ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Chọn danh mục"
-                />
-                {errors.category_id && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.category_id}
-                  </p>
-                )}
-              </div>
+              <CategorySelect
+                options={categories1}
+                value={category_id}
+                onChange={setCategory_id}
+                error={errors.category_id}
+              />
             )}
             {(modalOpenAddCategory3 || modalOpenEditCategory3) && (
-              <div>
-                <Select
-                  id="category_id"
-                  name="category_id"
-                  value={
-                    categories2
-                      .map((category) => ({
-                        value: category._id,
-                        label: category.name,
-                      }))
-                      .find((option) => option.value === category_id) || null
-                  }
-                  onChange={(selectedOption) =>
-                    setCategory_id(selectedOption ? selectedOption.value : "")
-                  }
-                  options={categories2.map((category) => ({
-                    value: category._id,
-                    label: category.name,
-                  }))}
-                  classNamePrefix="react-select"
-                  className={`w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
-                    errors.category_id ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Chọn danh mục"
-                />
-                {errors.category_id && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.category_id}
-                  </p>
-                )}
-              </div>
+              <CategorySelect
+                options={categories2}
+                value={category_id}
+                onChange={setCategory_id}
+                error={errors.category_id}
+              />
             )}
             <div className="relative">
               <input
@@ -243,6 +216,33 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
         </div>
       </div>
     )
+  );
+};
+
+const CategorySelect = ({ options, value, onChange, error }) => {
+  return (
+    <div>
+      <Select
+        value={
+          options
+            .map((category) => ({ value: category._id, label: category.name }))
+            .find((option) => option.value === value) || null
+        }
+        onChange={(selectedOption) =>
+          onChange(selectedOption ? selectedOption.value : "")
+        }
+        options={options.map((category) => ({
+          value: category._id,
+          label: category.name,
+        }))}
+        classNamePrefix="react-select"
+        className={`w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
+        placeholder="Chọn danh mục"
+      />
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+    </div>
   );
 };
 
