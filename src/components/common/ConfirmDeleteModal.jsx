@@ -14,7 +14,7 @@ const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, productName }) => {
           Xác nhận xóa
         </h3>
         <p className="text-gray-600 mb-6">
-          Bạn có chắc chắn muốn xóa sản phẩm <strong>{productName}</strong>?
+          Bạn có chắc chắn muốn xóa<strong>{productName}</strong>?
         </p>
         <div className="flex justify-end space-x-4">
           <button

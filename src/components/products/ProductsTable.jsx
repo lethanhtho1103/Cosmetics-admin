@@ -204,9 +204,9 @@ const ProductsTable = () => {
                     {sortConfig.key === col.key && (
                       <>
                         {sortConfig.direction === "ascending" ? (
-                          <ChevronUp className="inline ml-2" />
+                          <ChevronUp className="inline ml-2 text-blue-400" />
                         ) : (
-                          <ChevronDown className="inline ml-2" />
+                          <ChevronDown className="inline ml-2 text-blue-400" />
                         )}
                       </>
                     )}
@@ -282,7 +282,7 @@ const ProductsTable = () => {
             >
               {[5, 10, 15, 20].map((num) => (
                 <option key={num} value={num}>
-                  {num}
+                  {num}/{filteredProducts.length}
                 </option>
               ))}
             </select>

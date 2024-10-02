@@ -44,7 +44,6 @@ const categoryService = {
       const res = await axios.put(`/api/shop/${id}`, {
         name,
       });
-      console.log(res);
       return res.data;
     } catch (error) {
       console.error(error);
@@ -54,6 +53,48 @@ const categoryService = {
   async getCategory2() {
     try {
       const res = await axios.get("/api/cosmetic");
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async getCategory2ById(id) {
+    try {
+      const res = await axios.get(`/api/cosmetic/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async createCategory2({ category_id, name }) {
+    try {
+      const res = await axios.post("/api/cosmetic", {
+        shop_id: category_id,
+        name,
+      });
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async deleteCategory2(id) {
+    try {
+      const res = await axios.delete(`/api/cosmetic/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async updateCategory2(id, { category_id, name }) {
+    try {
+      const res = await axios.put(`/api/cosmetic/${id}`, {
+        shop_id: category_id,
+        name,
+      });
       return res.data;
     } catch (error) {
       console.error(error);

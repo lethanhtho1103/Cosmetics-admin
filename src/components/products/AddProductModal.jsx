@@ -112,8 +112,6 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product]);
 
-  console.log(productData.category_id);
-
   return (
     (modalOpenAdd || modalOpenEdit) && (
       <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">

@@ -56,7 +56,14 @@ function App() {
                     </CategoryProvider>
                   }
                 />
-                <Route path="/products/category2" element={<Category2Page />} />
+                <Route
+                  path="/products/category2"
+                  element={
+                    <CategoryProvider>
+                      <Category2Page />
+                    </CategoryProvider>
+                  }
+                />
                 <Route path="/products/category3" element={<Category3Page />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/sales" element={<SalesPage />} />
