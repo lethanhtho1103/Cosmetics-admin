@@ -298,7 +298,7 @@ const AddProductModal = ({ handleGetAllProducts, selectedCategory }) => {
                   label: category.name,
                 }))}
                 classNamePrefix="react-select"
-                className={`w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
+                className={`capitalize w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
                   errors.category_id ? "border-red-500" : "border-gray-300"
                 }`}
                 placeholder="Chọn danh mục"

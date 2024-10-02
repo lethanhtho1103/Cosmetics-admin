@@ -157,7 +157,7 @@ const TableCategory = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {index + 1 + (currentPage - 1) * itemsPerPage}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <td className="capitalize px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {category.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">

@@ -10,13 +10,10 @@ import Select from "react-select";
 import Pagination from "../common/Pagination";
 
 const TableCategory3 = () => {
-  const {
-    categories2,
-    categories3,
-    handleGetAllCategories3,
-    handleShowEditCategory3,
-  } = useContext(CategoryContext);
+  const { categories3, handleGetAllCategories3, handleShowEditCategory3 } =
+    useContext(CategoryContext);
 
+  const [categories2, setCategories2] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
@@ -112,6 +109,11 @@ const TableCategory3 = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryToDelete, closeDeleteModal]);
 
+  const handleGetAllCategories2 = async () => {
+    const res = await categoryService.getCategory2();
+    setCategories2(res);
+  };
+
   useEffect(() => {
     if (categories2 && categories2.length > 0) {
       const initialCategory = categories2[0]?._id;
@@ -119,6 +121,10 @@ const TableCategory3 = () => {
       handleGetAllCategories3(initialCategory);
     }
   }, [categories2, handleGetAllCategories3]);
+
+  useEffect(() => {
+    handleGetAllCategories2();
+  }, []);
 
   const selectOptions = useMemo(
     () =>
@@ -131,7 +137,10 @@ const TableCategory3 = () => {
 
   return (
     <>
-      <AddCategoryModal selectedCategory2={selectedCategory2} />
+      <AddCategoryModal
+        selectedCategory2={selectedCategory2}
+        categories2={categories2}
+      />
       <motion.div
         className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
         initial={{ opacity: 0, y: 20 }}
@@ -157,6 +166,7 @@ const TableCategory3 = () => {
                   ...provided,
                   backgroundColor: "#2d3748",
                   color: "white",
+                  textTransform: "capitalize",
                 }),
                 singleValue: (provided) => ({
                   ...provided,
@@ -169,6 +179,8 @@ const TableCategory3 = () => {
                 option: (provided, state) => ({
                   ...provided,
                   backgroundColor: state.isSelected ? "#4a5568" : "#2d3748",
+                  textTransform: "capitalize",
+
                   color: "white",
                   "&:hover": {
                     backgroundColor: "#4a5568",
@@ -234,7 +246,7 @@ const TableCategory3 = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {index + 1 + (currentPage - 1) * itemsPerPage}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <td className="capitalize px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {category.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 flex space-x-4">

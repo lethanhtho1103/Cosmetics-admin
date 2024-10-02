@@ -181,6 +181,7 @@ const ProductsTable = () => {
                   ...provided,
                   backgroundColor: "#2d3748",
                   color: "white",
+                  textTransform: "capitalize",
                 }),
                 singleValue: (provided) => ({
                   ...provided,
@@ -194,6 +195,7 @@ const ProductsTable = () => {
                   ...provided,
                   backgroundColor: state.isSelected ? "#4a5568" : "#2d3748",
                   color: "white",
+                  textTransform: "capitalize",
                   "&:hover": {
                     backgroundColor: "#4a5568",
                   },

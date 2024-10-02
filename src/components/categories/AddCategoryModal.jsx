@@ -4,7 +4,11 @@ import { toast } from "react-toastify";
 import CategoryContext from "../../contexts/CategoryContext";
 import Select from "react-select";
 
-const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
+const AddCategoryModal = ({
+  selectedCategory1,
+  selectedCategory2,
+  categories2,
+}) => {
   const {
     modalOpenAddCategory1,
     modalOpenEditCategory1,
@@ -14,7 +18,6 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
     modalOpenEditCategory3,
     closeModal,
     categories1,
-    categories2,
     category1,
     category2,
     category3,
@@ -91,11 +94,11 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
         handleGetAllCategories3(selectedCategory2);
       }
       toast.success(res.message);
-      handleCloseModal();
+      setName("");
+      setErrors({});
     } catch (error) {
       toast.error("Có lỗi xảy ra khi xử lý danh mục.");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     category1,
     category2,
@@ -153,25 +156,43 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
       <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
         <div className="bg-white rounded-lg w-full max-w-lg p-8 relative shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-            {isModalEdit ? "Chỉnh Sửa Danh mục" : "Thêm Danh Mục"}
+            {isModalEdit
+              ? `Chỉnh Sửa ${
+                  modalOpenEditCategory1
+                    ? "Danh Mục 1"
+                    : modalOpenEditCategory2
+                    ? "Danh Mục 2"
+                    : "Danh Mục 3"
+                }`
+              : `Thêm ${
+                  modalOpenAddCategory1
+                    ? "Danh Mục 1"
+                    : modalOpenAddCategory2
+                    ? "Danh Mục 2"
+                    : "Danh Mục 3"
+                }`}
           </h2>
           <div className="space-y-5">
-            {(modalOpenAddCategory2 || modalOpenEditCategory2) && (
-              <CategorySelect
-                options={categories1}
-                value={category_id}
-                onChange={setCategory_id}
-                error={errors.category_id}
-              />
-            )}
-            {(modalOpenAddCategory3 || modalOpenEditCategory3) && (
-              <CategorySelect
-                options={categories2}
-                value={category_id}
-                onChange={setCategory_id}
-                error={errors.category_id}
-              />
-            )}
+            <div className="relative">
+              {(modalOpenAddCategory2 || modalOpenEditCategory2) && (
+                <CategorySelect
+                  label="Danh mục 1"
+                  options={categories1}
+                  value={category_id}
+                  onChange={setCategory_id}
+                  error={errors.category_id}
+                />
+              )}
+              {(modalOpenAddCategory3 || modalOpenEditCategory3) && (
+                <CategorySelect
+                  label="Danh mục 2"
+                  options={categories2}
+                  value={category_id}
+                  onChange={setCategory_id}
+                  error={errors.category_id}
+                />
+              )}
+            </div>
             <div className="relative">
               <input
                 id="name"
@@ -209,7 +230,7 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
                 onClick={handleSubmit}
                 className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-300"
               >
-                {modalOpenAddCategory1 ? "Thêm Danh Mục" : "Lưu Thay Đổi"}
+                {isModalAdd ? "Thêm Danh Mục" : "Lưu Thay Đổi"}
               </button>
             </div>
           </div>
@@ -219,9 +240,12 @@ const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
   );
 };
 
-const CategorySelect = ({ options, value, onChange, error }) => {
+const CategorySelect = ({ label, options, value, onChange, error }) => {
   return (
     <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
       <Select
         value={
           options
@@ -236,14 +260,14 @@ const CategorySelect = ({ options, value, onChange, error }) => {
           label: category.name,
         }))}
         classNamePrefix="react-select"
-        className={`w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
+        className={`w-full capitalize border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
           error ? "border-red-500" : "border-gray-300"
         }`}
-        placeholder="Chọn danh mục"
+        placeholder={`Chọn ${label}`}
       />
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 };
 
-export default AddCategory1Modal;
+export default AddCategoryModal;

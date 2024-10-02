@@ -157,6 +157,7 @@ const TableCategory2 = () => {
                   ...provided,
                   backgroundColor: "#2d3748",
                   color: "white",
+                  textTransform: "capitalize",
                 }),
                 singleValue: (provided) => ({
                   ...provided,
@@ -170,6 +171,7 @@ const TableCategory2 = () => {
                   ...provided,
                   backgroundColor: state.isSelected ? "#4a5568" : "#2d3748",
                   color: "white",
+                  textTransform: "capitalize",
                   "&:hover": {
                     backgroundColor: "#4a5568",
                   },
@@ -199,45 +201,58 @@ const TableCategory2 = () => {
           </div>
         </div>
 
-        <table className="min-w-full bg-gray-800 text-white">
+        <table className="min-w-full divide-y divide-gray-700">
           <thead>
             <tr>
-              <th className="py-3 px-4 text-left">
-                <div
-                  className="flex items-center cursor-pointer"
-                  onClick={() => handleSort("name")}
-                >
-                  Tên danh mục{" "}
-                  {sortConfig.key === "name" &&
-                    (sortConfig.direction === "ascending" ? (
-                      <ChevronUp className="ml-1 w-4 h-4" />
-                    ) : (
-                      <ChevronDown className="ml-1 w-4 h-4" />
-                    ))}
-                </div>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                STT
               </th>
-              <th className="py-3 px-4 text-left">Hành động</th>
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("name")}
+              >
+                Tên
+                {sortConfig.key === "name" &&
+                  (sortConfig.direction === "ascending" ? (
+                    <ChevronUp className="inline ml-2 text-blue-400" />
+                  ) : (
+                    <ChevronDown className="inline ml-2 text-blue-400" />
+                  ))}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                Hành động
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
-            {currentCategories.map((category) => (
-              <tr key={category._id}>
-                <td className="py-3 px-4">{category.name}</td>
-                <td className="py-3 px-4 flex">
+            {currentCategories?.map((category, index) => (
+              <motion.tr
+                key={category._id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {index + 1 + (currentPage - 1) * itemsPerPage}
+                </td>
+                <td className="capitalize px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {category.name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 flex space-x-4">
                   <button
-                    onClick={() => handleShowEditCategory2(category)}
-                    className="text-blue-500 hover:text-blue-700"
+                    className="text-blue-400 hover:text-blue-500"
+                    onClick={() => handleShowEditCategory2(category?._id)}
                   >
-                    <Edit className="w-5 h-5" />
+                    <Edit size={16} />
                   </button>
                   <button
+                    className="text-red-400 hover:text-red-500"
                     onClick={() => openDeleteModal(category)}
-                    className="ml-3 text-red-500 hover:text-red-700"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash2 size={16} />
                   </button>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
           </tbody>
         </table>
