@@ -110,23 +110,47 @@ const categoryService = {
     }
   },
 
-  // async createProduct(formData) {
-  //   try {
-  //     const res = await axios.post("/api/product", formData);
-  //     return res.data;
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // },
+  async getCategory3ById(id) {
+    try {
+      const res = await axios.get(`/api/category/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 
-  // async deleteProduct(productId) {
-  //   try {
-  //     const res = await axios.delete(`/api/product/${productId}`);
-  //     return res.data;
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // },
+  async createCategory3({ category_id, name }) {
+    try {
+      const res = await axios.post("/api/category", {
+        cosmetic_id: category_id,
+        name,
+      });
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async deleteCategory3(id) {
+    try {
+      const res = await axios.delete(`/api/category/${id}`);
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async updateCategory3(id, { category_id, name }) {
+    try {
+      const res = await axios.put(`/api/category/${id}`, {
+        cosmetic_id: category_id,
+        name,
+      });
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 export default categoryService;

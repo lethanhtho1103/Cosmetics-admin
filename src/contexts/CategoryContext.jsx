@@ -13,6 +13,11 @@ export const CategoryProvider = ({ children }) => {
   const [modalOpenEditCategory2, setModalOpenEditCategory2] = useState(false);
   const [categories2, setCategories2] = useState([]);
   const [category2, setCategory2] = useState({});
+  const [modalOpenAddCategory3, setModalOpenAddCategory3] = useState(false);
+  const [modalOpenEditCategory3, setModalOpenEditCategory3] = useState(false);
+  const [categories3, setCategories3] = useState([]);
+  const [category3, setCategory3] = useState({});
+
   const handleShowAddCategory1 = async () => {
     try {
       setCategory1({});
@@ -51,11 +56,32 @@ export const CategoryProvider = ({ children }) => {
     }
   };
 
+  const handleShowAddCategory3 = async () => {
+    try {
+      setCategory3({});
+      setModalOpenAddCategory3(true);
+    } catch (error) {
+      toast.error("Lỗi khi lấy thông tin danh mục");
+    }
+  };
+
+  const handleShowEditCategory3 = async (id) => {
+    try {
+      const res = await categoryService.getCategory3ById(id);
+      setCategory3(res);
+      setModalOpenEditCategory3(true);
+    } catch (error) {
+      toast.error("Lỗi khi lấy thông tin danh mục");
+    }
+  };
+
   const closeModal = useCallback(() => {
     setModalOpenEditCategory1(false);
     setModalOpenAddCategory1(false);
     setModalOpenEditCategory2(false);
     setModalOpenAddCategory2(false);
+    setModalOpenEditCategory3(false);
+    setModalOpenAddCategory3(false);
   }, []);
 
   const handleGetAllCategories1 = async () => {
@@ -68,6 +94,18 @@ export const CategoryProvider = ({ children }) => {
       try {
         const res = await categoryService.getCategory1ById(categoryId);
         setCategories2(res?.cosmetics || []);
+        // setFilteredCategories(res?.cosmetics || []);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    }
+  }, []);
+
+  const handleGetAllCategories3 = useCallback(async (categoryId) => {
+    if (categoryId) {
+      try {
+        const res = await categoryService.getCategory2ById(categoryId);
+        setCategories3(res?.categories || []);
         // setFilteredCategories(res?.cosmetics || []);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -97,6 +135,13 @@ export const CategoryProvider = ({ children }) => {
         handleShowEditCategory2,
         handleShowAddCategory2,
         handleGetAllCategories2,
+        modalOpenAddCategory3,
+        modalOpenEditCategory3,
+        category3,
+        categories3,
+        handleShowEditCategory3,
+        handleShowAddCategory3,
+        handleGetAllCategories3,
       }}
     >
       {children}

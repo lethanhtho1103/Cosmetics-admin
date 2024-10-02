@@ -4,22 +4,29 @@ import { toast } from "react-toastify";
 import CategoryContext from "../../contexts/CategoryContext";
 import Select from "react-select";
 
-const AddCategory1Modal = ({ selectedCategory1 }) => {
+const AddCategory1Modal = ({ selectedCategory1, selectedCategory2 }) => {
   const {
     modalOpenAddCategory1,
     modalOpenEditCategory1,
     modalOpenAddCategory2,
     modalOpenEditCategory2,
+    modalOpenAddCategory3,
+    modalOpenEditCategory3,
     closeModal,
     categories1,
+    categories2,
     category1,
     category2,
+    category3,
     handleGetAllCategories1,
     handleGetAllCategories2,
+    handleGetAllCategories3,
   } = useContext(CategoryContext);
 
-  const isModalEdit = modalOpenEditCategory1 || modalOpenEditCategory2;
-  const isModalAdd = modalOpenAddCategory1 || modalOpenAddCategory2;
+  const isModalEdit =
+    modalOpenEditCategory1 || modalOpenEditCategory2 || modalOpenEditCategory3;
+  const isModalAdd =
+    modalOpenAddCategory1 || modalOpenAddCategory2 || modalOpenAddCategory3;
 
   const [name, setName] = useState("");
   const [category_id, setCategory_id] = useState("");
@@ -46,29 +53,34 @@ const AddCategory1Modal = ({ selectedCategory1 }) => {
       setErrors(validationErrors);
       return;
     }
-
     try {
       let res;
       if (modalOpenAddCategory1) {
         res = await categoryService.createCategory1({ name });
-        toast.success(res.message);
         handleGetAllCategories1();
       } else if (modalOpenEditCategory1) {
         res = await categoryService.updateCategory1(category1._id, { name });
-        toast.success(res.message);
         handleGetAllCategories1();
       } else if (modalOpenAddCategory2) {
         res = await categoryService.createCategory2({ category_id, name });
-        toast.success(res.message);
         handleGetAllCategories2(selectedCategory1);
       } else if (modalOpenEditCategory2) {
         res = await categoryService.updateCategory2(category2._id, {
           category_id,
           name,
         });
-        toast.success(res.message);
         handleGetAllCategories2(selectedCategory1);
+      } else if (modalOpenAddCategory3) {
+        res = await categoryService.createCategory3({ category_id, name });
+        handleGetAllCategories3(selectedCategory2);
+      } else if (modalOpenEditCategory3) {
+        res = await categoryService.updateCategory3(category3._id, {
+          category_id,
+          name,
+        });
+        handleGetAllCategories3(selectedCategory2);
       }
+      toast.success(res.message);
       handleCloseModal();
     } catch (error) {
       toast.error("Có lỗi xảy ra khi xử lý danh mục.");
@@ -102,6 +114,17 @@ const AddCategory1Modal = ({ selectedCategory1 }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category2]);
 
+  useEffect(() => {
+    if (category3) {
+      setName(category3.name || "");
+      setCategory_id(category3?.cosmetic_id || "");
+    } else {
+      setName("");
+      setCategory_id("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category3]);
+
   return (
     (isModalAdd || isModalEdit) && (
       <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
@@ -127,6 +150,39 @@ const AddCategory1Modal = ({ selectedCategory1 }) => {
                     setCategory_id(selectedOption ? selectedOption.value : "")
                   }
                   options={categories1.map((category) => ({
+                    value: category._id,
+                    label: category.name,
+                  }))}
+                  classNamePrefix="react-select"
+                  className={`w-full border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
+                    errors.category_id ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Chọn danh mục"
+                />
+                {errors.category_id && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.category_id}
+                  </p>
+                )}
+              </div>
+            )}
+            {(modalOpenAddCategory3 || modalOpenEditCategory3) && (
+              <div>
+                <Select
+                  id="category_id"
+                  name="category_id"
+                  value={
+                    categories2
+                      .map((category) => ({
+                        value: category._id,
+                        label: category.name,
+                      }))
+                      .find((option) => option.value === category_id) || null
+                  }
+                  onChange={(selectedOption) =>
+                    setCategory_id(selectedOption ? selectedOption.value : "")
+                  }
+                  options={categories2.map((category) => ({
                     value: category._id,
                     label: category.name,
                   }))}
