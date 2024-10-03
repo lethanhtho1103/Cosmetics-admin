@@ -1,13 +1,14 @@
-import { motion } from "framer-motion";
-import { Edit, Search, Trash2 } from "lucide-react";
 import { useState, useEffect, useContext } from "react";
-import { ChevronUp, ChevronDown } from "lucide-react";
-import { toast } from "react-toastify";
+import { motion } from "framer-motion";
+import SearchBar from "../common/SearchBar";
+import TableHeader from "../common/TableHeader";
+import TableRow from "../common/TableRow";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
+import Pagination from "../common/Pagination";
 import CategoryContext from "../../contexts/CategoryContext";
 import AddCategoryModal from "./AddCategoryModal";
 import categoryService from "../../services/categoryService";
-import Pagination from "../common/Pagination";
+import { toast } from "react-toastify";
 
 const TableCategory = () => {
   const { handleShowEditCategory1, categories1, handleGetAllCategories1 } =
@@ -25,44 +26,39 @@ const TableCategory = () => {
     setFilteredCategories(categories1);
   }, [categories1]);
 
-  const indexOfLastCategory = currentPage * itemsPerPage;
-  const indexOfFirstCategory = indexOfLastCategory - itemsPerPage;
-  const currentCategories = filteredCategories?.slice(
-    indexOfFirstCategory,
-    indexOfLastCategory
-  );
-  const totalPages = Math.ceil(filteredCategories?.length / itemsPerPage);
+  const columns = [
+    { key: "index", label: "STT", sortable: false },
+    { key: "name", label: "Tên", sortable: true },
+    { key: "actions", label: "Hành động", sortable: false },
+  ];
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    if (term === "") {
-      setFilteredCategories(categories1);
-    } else {
-      const filtered = categories1.filter((category) => {
-        return category.name.toLowerCase().includes(term);
-      });
-      setFilteredCategories(filtered);
-    }
+    setFilteredCategories(
+      term === ""
+        ? categories1
+        : categories1.filter((category) =>
+            category.name.toLowerCase().includes(term)
+          )
+    );
   };
 
   const handleSort = (key) => {
-    let direction = "ascending";
-    if (sortConfig.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
-    }
+    const direction =
+      sortConfig.key === key && sortConfig.direction === "ascending"
+        ? "descending"
+        : "ascending";
+
     setSortConfig({ key, direction });
 
-    const sortedCategories = [...filteredCategories].sort((a, b) => {
-      if (a[key] < b[key]) {
-        return direction === "ascending" ? -1 : 1;
-      }
-      if (a[key] > b[key]) {
-        return direction === "ascending" ? 1 : -1;
-      }
-      return 0;
+    setFilteredCategories((prev) => {
+      return [...prev].sort((a, b) => {
+        if (a[key] < b[key]) return direction === "ascending" ? -1 : 1;
+        if (a[key] > b[key]) return direction === "ascending" ? 1 : -1;
+        return 0;
+      });
     });
-    setFilteredCategories(sortedCategories);
   };
 
   const handleDelete = async (categoryId) => {
@@ -70,7 +66,7 @@ const TableCategory = () => {
       const res = await categoryService.deleteCategory1(categoryId);
       toast.success(res.message);
       handleGetAllCategories1();
-      if (currentPage > 1 && currentCategories.length === 1) {
+      if (currentPage > 1 && filteredCategories.length === 1) {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
       }
     } catch (error) {
@@ -95,6 +91,14 @@ const TableCategory = () => {
     }
   };
 
+  const indexOfLastCategory = currentPage * itemsPerPage;
+  const indexOfFirstCategory = indexOfLastCategory - itemsPerPage;
+  const currentCategories = filteredCategories?.slice(
+    indexOfFirstCategory,
+    indexOfLastCategory
+  );
+  const totalPages = Math.ceil(filteredCategories?.length / itemsPerPage);
+
   return (
     <>
       <AddCategoryModal />
@@ -108,73 +112,30 @@ const TableCategory = () => {
           <h2 className="text-xl font-semibold text-gray-100">
             Danh sách danh mục cấp 1
           </h2>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm..."
-              className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={handleSearch}
-              value={searchTerm}
-            />
-            <Search
-              className="absolute left-3 top-2.5 text-gray-400"
-              size={18}
-            />
-          </div>
+          <SearchBar
+            searchTerm={searchTerm}
+            handleSearch={handleSearch}
+            placeholder="Tìm kiếm danh mục..."
+          />
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-700">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  STT
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("name")}
-                >
-                  Tên
-                  {sortConfig.key === "name" &&
-                    (sortConfig.direction === "ascending" ? (
-                      <ChevronUp className="inline ml-2 text-blue-400" />
-                    ) : (
-                      <ChevronDown className="inline ml-2 text-blue-400" />
-                    ))}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
+            <TableHeader
+              columns={columns}
+              sortConfig={sortConfig}
+              handleSort={handleSort}
+            />
             <tbody className="divide-y divide-gray-700">
               {currentCategories?.map((category, index) => (
-                <motion.tr
+                <TableRow
                   key={category._id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {index + 1 + (currentPage - 1) * itemsPerPage}
-                  </td>
-                  <td className="capitalize px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {category.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    <button
-                      className="text-indigo-400 hover:text-indigo-300 mr-2"
-                      onClick={() => handleShowEditCategory1(category._id)}
-                    >
-                      <Edit size={18} />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(category)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </td>
-                </motion.tr>
+                  category={category}
+                  index={index}
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  onEdit={handleShowEditCategory1}
+                  onDelete={openDeleteModal}
+                />
               ))}
             </tbody>
           </table>
@@ -191,7 +152,6 @@ const TableCategory = () => {
           isOpen={isModalOpen}
           onClose={closeDeleteModal}
           onConfirm={confirmDelete}
-          productName={categoryToDelete?.name}
         />
       </motion.div>
     </>

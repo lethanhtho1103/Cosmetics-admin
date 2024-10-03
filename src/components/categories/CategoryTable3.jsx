@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Edit, Search, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
@@ -8,6 +7,9 @@ import AddCategoryModal from "./AddCategoryModal";
 import categoryService from "../../services/categoryService";
 import Select from "react-select";
 import Pagination from "../common/Pagination";
+import SearchBar from "../common/SearchBar";
+import TableHeader from "../common/TableHeader";
+import TableRow from "../common/TableRow";
 
 const TableCategory3 = () => {
   const { categories3, handleGetAllCategories3, handleShowEditCategory3 } =
@@ -22,6 +24,12 @@ const TableCategory3 = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [selectedCategory2, setSelectedCategory2] = useState("");
+
+  const columns = [
+    { key: "index", label: "STT", sortable: false },
+    { key: "name", label: "Tên", sortable: true },
+    { key: "actions", label: "Hành động", sortable: false },
+  ];
 
   const handleCategoryChange = useCallback((selectedOption) => {
     const selected = selectedOption.value;
@@ -197,73 +205,30 @@ const TableCategory3 = () => {
               }}
             />
           </div>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm..."
-              className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={handleSearch}
-              value={searchTerm}
-            />
-            <Search
-              className="absolute left-3 top-2.5 text-gray-400"
-              size={18}
-            />
-          </div>
+          <SearchBar
+            searchTerm={searchTerm}
+            handleSearch={handleSearch}
+            placeholder="Tìm kiếm danh mục..."
+          />
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-700">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  STT
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("name")}
-                >
-                  Tên
-                  {sortConfig.key === "name" &&
-                    (sortConfig.direction === "ascending" ? (
-                      <ChevronUp className="inline ml-2 text-blue-400" />
-                    ) : (
-                      <ChevronDown className="inline ml-2 text-blue-400" />
-                    ))}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
+            <TableHeader
+              columns={columns}
+              sortConfig={sortConfig}
+              handleSort={handleSort}
+            />
             <tbody className="divide-y divide-gray-700">
               {currentCategories?.map((category, index) => (
-                <motion.tr
+                <TableRow
                   key={category._id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {index + 1 + (currentPage - 1) * itemsPerPage}
-                  </td>
-                  <td className="capitalize px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {category.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 flex space-x-4">
-                    <button
-                      className="text-blue-400 hover:text-blue-500"
-                      onClick={() => handleShowEditCategory3(category?._id)}
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      className="text-red-400 hover:text-red-500"
-                      onClick={() => openDeleteModal(category)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </motion.tr>
+                  category={category}
+                  index={index}
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  onEdit={handleShowEditCategory3}
+                  onDelete={openDeleteModal}
+                />
               ))}
             </tbody>
           </table>

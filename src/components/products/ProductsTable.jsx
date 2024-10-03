@@ -1,15 +1,16 @@
 import { motion } from "framer-motion";
-import { Edit, Search, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useState, useEffect, useMemo, useContext } from "react";
 import productService from "../../services/productService";
 import { baseUrl } from "../../axios";
-import { ChevronUp, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import ProductContext from "../../contexts/ProductContext";
 import AddProductModal from "./AddProductModal";
 import Pagination from "../common/Pagination";
 import Select from "react-select";
+import SearchBar from "../common/SearchBar";
+import TableHeader from "../common/TableHeader";
 
 const ProductsTable = () => {
   const { handleShowEditProduct, categories } = useContext(ProductContext);
@@ -150,6 +151,16 @@ const ProductsTable = () => {
     [categories]
   );
 
+  const columns = [
+    { label: "Tên", key: "name", sortable: true },
+    { label: "Giá", key: "price", sortable: true },
+    { label: "Số lượng", key: "quantity", sortable: true },
+    { label: "Thương hiệu", key: "trademark", sortable: true },
+    { label: "Xuất xứ", key: "origin", sortable: true },
+    { label: "Đã bán", key: "sold_quantity", sortable: true },
+    { key: "actions", label: "Hành động", sortable: false },
+  ];
+
   return (
     <>
       <AddProductModal
@@ -211,54 +222,19 @@ const ProductsTable = () => {
               }}
             />
           </div>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm..."
-              className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onChange={handleSearch}
-              value={searchTerm}
-            />
-            <Search
-              className="absolute left-3 top-2.5 text-gray-400"
-              size={18}
-            />
-          </div>
+          <SearchBar
+            searchTerm={searchTerm}
+            handleSearch={handleSearch}
+            placeholder="Tìm kiếm danh mục..."
+          />
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-700">
-            <thead>
-              <tr>
-                {[
-                  { label: "Tên", key: "name" },
-                  { label: "Giá", key: "price" },
-                  { label: "Số lượng", key: "quantity" },
-                  { label: "Thương hiệu", key: "trademark" },
-                  { label: "Xuất xứ", key: "origin" },
-                  { label: "Đã bán", key: "sold_quantity" },
-                ].map((col) => (
-                  <th
-                    key={col.key}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                    onClick={() => handleSort(col.key)}
-                  >
-                    {col.label}
-                    {sortConfig.key === col.key && (
-                      <>
-                        {sortConfig.direction === "ascending" ? (
-                          <ChevronUp className="inline ml-2 text-blue-400" />
-                        ) : (
-                          <ChevronDown className="inline ml-2 text-blue-400" />
-                        )}
-                      </>
-                    )}
-                  </th>
-                ))}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
+            <TableHeader
+              columns={columns}
+              sortConfig={sortConfig}
+              handleSort={handleSort}
+            />
 
             <tbody className="divide-y divide-gray-700">
               {currentProducts.map((product) => (
