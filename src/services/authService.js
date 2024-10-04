@@ -2,6 +2,15 @@ import axios from "../axios";
 import { logOutSuccess } from "../redux/authSlice";
 
 const authService = {
+  async getAllUsers() {
+    try {
+      const res = await axios.get("/api/authentication/get-all-users");
+      return res?.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
   async loginAdmin(email, password) {
     const res = await axios.post("/api/authentication/login-admin", {
       email,

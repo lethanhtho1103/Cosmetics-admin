@@ -1,4 +1,4 @@
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowUpNarrowWide, ArrowDownWideNarrow } from "lucide-react";
 
 const TableHeader = ({ columns, sortConfig, handleSort }) => {
   return (
@@ -15,9 +15,9 @@ const TableHeader = ({ columns, sortConfig, handleSort }) => {
             {col.label}
             {sortConfig.key === col.key &&
               (sortConfig.direction === "ascending" ? (
-                <ChevronUp className="inline ml-2 text-blue-400" />
+                <ArrowUpNarrowWide className="inline ml-2 text-blue-400" />
               ) : (
-                <ChevronDown className="inline ml-2 text-blue-400" />
+                <ArrowDownWideNarrow className="inline ml-2 text-blue-400" />
               ))}
           </th>
         ))}

@@ -4,12 +4,12 @@ import { toast } from "react-toastify";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import CategoryContext from "../../contexts/CategoryContext";
 import AddCategoryModal from "./AddCategoryModal";
-import Pagination from "../common/Pagination";
 import categoryService from "../../services/categoryService";
 import Select from "react-select";
 import SearchBar from "../common/SearchBar";
 import TableHeader from "../common/TableHeader";
 import TableRow from "../common/TableRow";
+import TablePagination from "@mui/material/TablePagination";
 
 const TableCategory2 = () => {
   const {
@@ -22,8 +22,8 @@ const TableCategory2 = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [selectedCategory1, setSelectedCategory1] = useState("");
@@ -45,15 +45,19 @@ const TableCategory2 = () => {
     { key: "actions", label: "Hành động", sortable: false },
   ];
 
-  const currentCategories = useMemo(() => {
-    const indexOfLastCategory = currentPage * itemsPerPage;
-    const indexOfFirstCategory = indexOfLastCategory - itemsPerPage;
-    return filteredCategories?.slice(indexOfFirstCategory, indexOfLastCategory);
-  }, [filteredCategories, currentPage, itemsPerPage]);
+  const handleChangePage = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
 
-  const totalPages = useMemo(() => {
-    return Math.ceil(filteredCategories?.length / itemsPerPage);
-  }, [filteredCategories?.length, itemsPerPage]);
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(0);
+  };
+
+  const currentCategories = filteredCategories?.slice(
+    currentPage * rowsPerPage,
+    currentPage * rowsPerPage + rowsPerPage
+  );
 
   const handleSearch = useCallback(
     (e) => {
@@ -214,8 +218,6 @@ const TableCategory2 = () => {
                 key={category._id}
                 category={category}
                 index={index}
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
                 onEdit={handleShowEditCategory2}
                 onDelete={openDeleteModal}
               />
@@ -223,13 +225,30 @@ const TableCategory2 = () => {
           </tbody>
         </table>
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          setItemsPerPage={setItemsPerPage}
-          setCurrentPage={setCurrentPage}
-          filteredCategoriesLength={filteredCategories?.length}
+        <TablePagination
+          component="div"
+          count={filteredCategories?.length || 0}
+          page={currentPage}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Hiển thị"
+          rowsPerPageOptions={[5, 10, 15, 20]}
+          sx={{
+            color: "white",
+            "& .MuiTablePagination-actions": {
+              color: "white",
+            },
+            "& .MuiTablePagination-selectLabel": {
+              color: "white",
+            },
+            "& .MuiTablePagination-input": {
+              color: "white",
+            },
+            "& .MuiTablePagination-selectIcon": {
+              color: "white",
+            },
+          }}
         />
       </motion.div>
 

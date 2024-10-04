@@ -1,14 +1,7 @@
 import { Edit, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-const TableRow = ({
-  category,
-  index,
-  currentPage,
-  itemsPerPage,
-  onEdit,
-  onDelete,
-}) => {
+const TableRow = ({ category, index, onEdit, onDelete }) => {
   return (
     <motion.tr
       key={category._id}
@@ -17,7 +10,7 @@ const TableRow = ({
       transition={{ duration: 0.3 }}
     >
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-        {index + 1 + (currentPage - 1) * itemsPerPage}
+        {index + 1}
       </td>
       <td className="capitalize px-6 py-4 whitespace-nowrap text-sm text-gray-300">
         {category.name}

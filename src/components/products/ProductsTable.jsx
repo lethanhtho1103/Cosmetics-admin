@@ -7,10 +7,10 @@ import { toast } from "react-toastify";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import ProductContext from "../../contexts/ProductContext";
 import AddProductModal from "./AddProductModal";
-import Pagination from "../common/Pagination";
 import Select from "react-select";
 import SearchBar from "../common/SearchBar";
 import TableHeader from "../common/TableHeader";
+import TablePagination from "@mui/material/TablePagination";
 
 const ProductsTable = () => {
   const { handleShowEditProduct, categories } = useContext(ProductContext);
@@ -19,20 +19,25 @@ const ProductsTable = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
-  const indexOfLastProduct = currentPage * itemsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const handleChangePage = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
 
-  // Function to sort products
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(0);
+  };
+
+  const currentProducts = filteredProducts?.slice(
+    currentPage * rowsPerPage,
+    currentPage * rowsPerPage + rowsPerPage
+  );
+
   const handleSort = (key) => {
     let direction = "ascending";
     if (sortConfig.key === key && sortConfig.direction === "ascending") {
@@ -290,13 +295,30 @@ const ProductsTable = () => {
             </tbody>
           </table>
         </div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
-          setItemsPerPage={setItemsPerPage}
-          setCurrentPage={setCurrentPage}
-          filteredCategoriesLength={filteredProducts?.length}
+        <TablePagination
+          component="div"
+          count={filteredProducts?.length || 0}
+          page={currentPage}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 15, 20]}
+          labelRowsPerPage="Hiển thị"
+          sx={{
+            color: "white",
+            "& .MuiTablePagination-actions": {
+              color: "white",
+            },
+            "& .MuiTablePagination-selectLabel": {
+              color: "white",
+            },
+            "& .MuiTablePagination-input": {
+              color: "white",
+            },
+            "& .MuiTablePagination-selectIcon": {
+              color: "white",
+            },
+          }}
         />
         <ConfirmDeleteModal
           isOpen={isModalOpen}

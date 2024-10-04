@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import UsersTable from "../components/users/UsersTable";
-import UserGrowthChart from "../components/users/UserGrowthChart";
-import UserActivityHeatmap from "../components/users/UserActivityHeatmap";
 import UserDemographicsChart from "../components/users/UserDemographicsChart";
+import { useEffect, useState } from "react";
+import authService from "../services/authService";
 
 const userStats = {
   totalUsers: 152845,
@@ -16,6 +16,16 @@ const userStats = {
 };
 
 const UsersPage = () => {
+  const [users, setUsers] = useState([]);
+
+  const handleGetAllUsers = async () => {
+    const res = await authService.getAllUsers();
+    setUsers(res?.data);
+  };
+
+  useEffect(() => {
+    handleGetAllUsers();
+  }, []);
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <Header title="Người Dùng" />
@@ -54,12 +64,11 @@ const UsersPage = () => {
           />
         </motion.div>
 
-        <UsersTable />
+        <UsersTable users={users} />
 
-        {/* BIỂU ĐỒ NGƯỜI DÙNG */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          <UserGrowthChart />
-          <UserActivityHeatmap />
+          {/* <UserGrowthChart />
+          <UserActivityHeatmap /> */}
           <UserDemographicsChart />
         </div>
       </main>
