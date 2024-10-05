@@ -6,14 +6,14 @@ import { baseUrl } from "../../axios";
 import { toast } from "react-toastify";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import ProductContext from "../../contexts/ProductContext";
-import AddProductModal from "./AddProductModal";
 import Select from "react-select";
 import SearchBar from "../common/SearchBar";
 import TableHeader from "../common/TableHeader";
 import TablePagination from "@mui/material/TablePagination";
 
 const ProductsTable = () => {
-  const { handleShowEditProduct, categories } = useContext(ProductContext);
+  const { handleShowEditProduct, categories, formatNumber } =
+    useContext(ProductContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -168,10 +168,6 @@ const ProductsTable = () => {
 
   return (
     <>
-      <AddProductModal
-        handleGetAllProducts={handleGetAllProducts}
-        selectedCategory={selectedCategory}
-      />
       <motion.div
         className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
         initial={{ opacity: 0, y: 20 }}
@@ -256,21 +252,21 @@ const ProductsTable = () => {
                       className="size-10 rounded-full"
                     />
                     {product?.name.length > 20
-                      ? product?.name.substring(0, 20) + "..."
+                      ? product?.name.substring(0, 30) + "..."
                       : product?.name}
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {product?.price}
+                    {formatNumber(product?.price)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {product?.quantity}
+                    {formatNumber(product?.quantity)}
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 uppercase">
                     {product?.trademark}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 capitalize">
                     {product?.origin}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">

@@ -10,7 +10,7 @@ export const ProductProvider = ({ children }) => {
   const [modalOpenEdit, setModalOpenEdit] = useState(false);
   const [categories, setCategories] = useState();
 
-  const [product, setProduct] = useState([]);
+  const [product, setProduct] = useState(null);
 
   const handleShowEditProduct = async (nameProduct) => {
     try {
@@ -24,7 +24,7 @@ export const ProductProvider = ({ children }) => {
 
   const handleShowAddProduct = async () => {
     try {
-      setProduct([]);
+      setProduct(null);
       setModalOpenAdd(true);
     } catch (error) {
       toast.error("Lỗi khi lấy thông tin sản phẩm");
@@ -41,6 +41,9 @@ export const ProductProvider = ({ children }) => {
     setCategories(res);
   };
 
+  const formatNumber = (num) =>
+    num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
   useEffect(() => {
     handleGetAllCategories();
   }, []);
@@ -55,6 +58,7 @@ export const ProductProvider = ({ children }) => {
         closeModal,
         handleShowEditProduct,
         handleShowAddProduct,
+        formatNumber,
       }}
     >
       {children}
