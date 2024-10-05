@@ -9,13 +9,15 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import orderService from "../../services/orderService";
 import { baseUrl } from "../../axios";
 import { toast } from "react-toastify";
 
 function ViewOrder({ orderId, formatDate, onClose }) {
   const [order, setOrder] = useState({});
-  const [selectedStatus, setSelectedStatus] = useState("denied");
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const formatNumber = (num) =>
     num?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -23,6 +25,7 @@ function ViewOrder({ orderId, formatDate, onClose }) {
   const handleGetAllOrder = async () => {
     const res = await orderService.getOrderById(orderId);
     setOrder(res?.data);
+    setSelectedStatus(res?.data?.status || ""); // Thiết lập giá trị trạng thái khi nhận dữ liệu
   };
 
   useEffect(() => {
@@ -30,7 +33,7 @@ function ViewOrder({ orderId, formatDate, onClose }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 
-  const handleCancelOrder = async () => {
+  const handleUpdateStatusOrder = async () => {
     await orderService.updateStatus(orderId, selectedStatus);
     await handleGetAllOrder();
     toast.success("Cập nhật trạng thái đơn hàng thành công.");
@@ -38,30 +41,36 @@ function ViewOrder({ orderId, formatDate, onClose }) {
 
   return (
     <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
-      <DialogContent>
-        <Box sx={{ padding: "20px" }}>
+      <DialogContent sx={{ padding: "28px" }}>
+        <Box>
+          <Box
+            onClick={onClose}
+            size="small"
+            sx={{
+              position: "absolute",
+              padding: "2px 4px",
+              top: "2px",
+              right: "2px",
+              zIndex: 10,
+              backgroundColor: "transparent",
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.1)",
+                cursor: "pointer",
+              },
+            }}
+          >
+            <CloseIcon />
+          </Box>
           <Card
             variant="outlined"
-            sx={{ position: "relative", marginBottom: "24px" }}
-            key={order._id}
+            sx={{
+              position: "relative",
+              boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
+              borderRadius: "8px",
+            }}
           >
-            <Button
-              onClick={onClose}
-              sx={{
-                position: "absolute",
-                top: "8px",
-                right: "10px",
-                zIndex: 1,
-                backgroundColor: "transparent",
-                "&:hover": {
-                  backgroundColor: "transparent",
-                },
-              }}
-            >
-              <CloseIcon />
-            </Button>
             <CardContent>
-              <Grid>
+              <Grid container spacing={2}>
                 <Grid
                   item
                   xs={12}
@@ -70,7 +79,6 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                   sx={{
                     borderBottom: "1px solid #e0e0e0",
                     paddingBottom: "12px",
-                    mb: "12px",
                   }}
                 >
                   <Box
@@ -83,15 +91,16 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                       variant="h6"
                       sx={{
                         color: "white",
-                        padding: "0px 6px",
-                        backgroundColor: "#e67e23",
+                        padding: "4px 12px",
+                        borderRadius: "4px",
+                        backgroundColor: "#FF8C00",
                       }}
                     >
                       Orange
                     </Typography>
                     <Typography
                       variant="h6"
-                      sx={{ ml: 2, color: "#0000008a", fontSize: "16px" }}
+                      sx={{ ml: 2, color: "#555", fontSize: "16px" }}
                     >
                       Ngày đặt: {formatDate(order?.order_date)}
                     </Typography>
@@ -114,15 +123,22 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                     <Typography
                       variant="body2"
                       sx={{
-                        color: "red",
-                        fontWeight: 500,
+                        color:
+                          order?.status === "delivered"
+                            ? "#26aa99"
+                            : order?.status === "denied"
+                            ? "red"
+                            : order?.status === "shipped"
+                            ? "blue"
+                            : "#FFA500",
+                        fontWeight: 600,
                         textTransform: "uppercase",
                       }}
                     >
                       {order?.status === "pending"
                         ? "Chờ xác nhận"
-                        : order?.status === "accepted"
-                        ? "Chờ giao hàng"
+                        : order?.status === "shipped"
+                        ? "Đang vận chuyển"
                         : order?.status === "delivered"
                         ? "Hoàn thành"
                         : order?.status === "denied"
@@ -132,44 +148,17 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                   </Box>
                 </Grid>
 
-                <Grid item xs={12} sx={{ marginTop: "12px", mb: "12px" }}>
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
-                    style={{
-                      marginRight: "12px",
-                      padding: "8px",
-                      borderRadius: "4px",
-                      border: "1px solid #ccc",
-                    }}
-                  >
-                    {/* <option value="pending">Chờ xác nhận</option> */}
-                    <option value="shipped">Đang vận chuyển</option>
-                    <option value="delivered">Hoàn thành</option>
-                    <option value="denied">Hủy đơn</option>
-                  </select>
-                  <Button
-                    variant="contained"
-                    onClick={handleCancelOrder}
-                    sx={{ backgroundColor: "#e67e23", color: "#fff" }}
-                  >
-                    Cập nhật trạng thái
-                  </Button>
-                </Grid>
-
                 {order?.orderDetails?.map((orderDetail, index) => (
-                  <Grid
-                    item
-                    xs={12}
-                    container
-                    sx={{ marginTop: "12px", mb: "12px" }}
-                    key={index}
-                  >
+                  <Grid item xs={12} container key={index} spacing={2}>
                     <Grid item xs={12} md={2}>
                       <img
                         src={`${baseUrl}/${orderDetail?.product_image}`}
                         alt={orderDetail?.product_name}
-                        style={{ width: "90%", borderRadius: "4px" }}
+                        style={{
+                          width: "100%",
+                          borderRadius: "8px",
+                          border: "1px solid #c0c0c0",
+                        }}
                       />
                     </Grid>
                     <Grid item xs={12} md={10}>
@@ -177,8 +166,7 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                         variant="body1"
                         sx={{
                           fontWeight: 500,
-                          width: "90%",
-                          color: "#000 !important",
+                          color: "#000",
                         }}
                       >
                         {orderDetail?.product_name}
@@ -193,24 +181,22 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                         <Typography
                           variant="body2"
                           sx={{
-                            mt: "6px ",
-                            color: "#0000008a !important",
-                            display: "flex",
-                            alignItems: "center",
+                            mt: "6px",
+                            color: "#555",
                           }}
                         >
                           Số lượng:
                           <Typography
+                            component="span"
                             sx={{
-                              color: "#000 !important",
                               fontWeight: 500,
-                              ml: "4px",
+                              ml: 1,
                             }}
                           >
                             x{orderDetail?.quantity}
                           </Typography>
                         </Typography>
-                        <Typography sx={{ color: "#000 !important" }}>
+                        <Typography sx={{ fontWeight: 500 }}>
                           {formatNumber(orderDetail?.unit_price)}₫
                         </Typography>
                       </Box>
@@ -221,29 +207,63 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                   item
                   xs={12}
                   sx={{
-                    textAlign: "right",
                     paddingTop: "12px",
-                    marginTop: "12px",
                     borderTop: "1px solid #e0e0e0",
+                    mt: 2,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
                   <Typography
                     variant="body1"
                     sx={{
                       color: "red",
-                      marginBottom: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      flex: 1,
-                      justifyContent: "flex-end",
                       fontWeight: "500",
                     }}
                   >
-                    <span style={{ color: "black", margin: "0 4px" }}>
+                    <span style={{ color: "#000", marginRight: "8px" }}>
                       Thành tiền:
                     </span>
                     {formatNumber(order?.total_price)}₫
                   </Typography>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      size="small"
+                      sx={{
+                        marginRight: "12px",
+                        borderRadius: "4px",
+                        padding: "0 4px",
+                      }}
+                    >
+                      <MenuItem value="">Chọn trạng thái</MenuItem>
+                      <MenuItem value="shipped">Đang vận chuyển</MenuItem>
+                      <MenuItem value="delivered">Hoàn thành</MenuItem>
+                      <MenuItem value="denied">Hủy đơn</MenuItem>
+                    </Select>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      onClick={handleUpdateStatusOrder}
+                      sx={{
+                        backgroundColor: "#FF8C00",
+                        color: "#fff",
+                        padding: "8px 16px",
+                        fontWeight: "bold",
+                        "&:hover": { backgroundColor: "#FF7F00" },
+                      }}
+                    >
+                      Cập nhật
+                    </Button>
+                  </Grid>
                 </Grid>
               </Grid>
             </CardContent>
