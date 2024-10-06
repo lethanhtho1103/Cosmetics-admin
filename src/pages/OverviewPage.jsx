@@ -1,12 +1,31 @@
-import { BarChart2, ShoppingBag, Users, Zap } from "lucide-react";
+import { ShoppingBag, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
-import SalesOverviewChart from "../components/overview/SalesOverviewChart";
 import CategoryDistributionChart from "../components/overview/CategoryDistributionChart";
+import DailyOrders from "../components/orders/DailyOrders";
+import { useEffect, useState } from "react";
+import statisticsService from "../services/statisticsService";
 
 const OverviewPage = () => {
+  const [statistics, setStatistics] = useState({
+    totalRevenue: 0,
+    totalProducts: 0,
+    totalUsers: 0,
+  });
+  function formatNumberWithCommas(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+  const handleGetStatistics = async () => {
+    const res = await statisticsService.getStatistics();
+    setStatistics(res.data);
+    console.log(statistics);
+  };
+
+  useEffect(() => {
+    handleGetStatistics();
+  }, []);
+
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <Header title="Tổng Quan" />
@@ -21,31 +40,27 @@ const OverviewPage = () => {
           <StatCard
             name="Tổng Doanh Thu"
             icon={Zap}
-            value="$12,345"
+            value={formatNumberWithCommas(statistics?.totalRevenue)}
             color="#6366F1"
           />
           <StatCard
-            name="Người Dùng Mới"
+            name="Tổng Người Dùng"
             icon={Users}
-            value="1,234"
+            value={statistics?.totalUsers}
             color="#8B5CF6"
           />
           <StatCard
             name="Tổng Sản Phẩm"
             icon={ShoppingBag}
-            value="567"
+            value={statistics?.totalProducts}
             color="#EC4899"
-          />
-          <StatCard
-            name="Tỷ Lệ Chuyển Đổi"
-            icon={BarChart2}
-            value="12.5%"
-            color="#10B981"
           />
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <SalesOverviewChart />
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
+          <DailyOrders isOverview={true} />
+        </div>
+        <div className="grid  mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
           <CategoryDistributionChart />
         </div>
       </main>

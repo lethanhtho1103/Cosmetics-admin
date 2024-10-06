@@ -19,20 +19,6 @@ const orderService = {
     }
   },
 
-  async getOrderStatisticsByMonth({ year, month }) {
-    try {
-      const res = await axios.get("/api/order/statistics/month", {
-        params: {
-          year,
-          month,
-        },
-      });
-      return res?.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || "Thất bại");
-    }
-  },
-
   async updateStatus(orderId, status) {
     try {
       const response = await axios.put("/api/order/update/status", {

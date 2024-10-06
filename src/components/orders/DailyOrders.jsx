@@ -10,20 +10,26 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import orderService from "../../services/orderService";
+import statisticsService from "../../services/statisticsService";
 
-const DailyOrders = () => {
+const DailyOrders = ({ isOverview }) => {
   const [ordersStatistics, setOrdersStatistics] = useState([]);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth() + 1); // Tháng bắt đầu từ 0 nên +1
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
 
   const handleGetOrderStatistics = async () => {
     try {
-      const res = await orderService.getOrderStatisticsByMonth({ year, month });
-      const formattedData = res.data.map((item) => ({
-        date: `${item.day}`,
-        orders: item.count,
-      }));
+      const res = await statisticsService.getOrderStatisticsByMonth({
+        year,
+        month,
+      });
+      const formattedData = res.data.map((item) => {
+        const key = isOverview ? "Doanh_so" : "Don_hang";
+        return {
+          date: `${item.day}`,
+          [key]: isOverview ? item.totalRevenue : item.count,
+        };
+      });
       setOrdersStatistics(formattedData);
     } catch (error) {
       console.error("Error fetching order statistics:", error);
@@ -43,12 +49,12 @@ const DailyOrders = () => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-5">
-        <h2 className="text-xl font-semibold text-gray-100 ">
-          Thống kê đơn hàng
+        <h2 className="text-xl font-semibold text-gray-100 capitalize">
+          {isOverview ? "Doanh số" : "Thống kê đơn hàng"}
         </h2>
 
         <div>
-          <label className="text-gray-200">Year:</label>
+          <label className="text-gray-200">Năm:</label>
           <select
             value={year}
             onChange={(e) => setYear(e.target.value)}
@@ -61,7 +67,7 @@ const DailyOrders = () => {
             ))}
           </select>
 
-          <label className="text-gray-200 ml-4">Month:</label>
+          <label className="text-gray-200 ml-4">Tháng:</label>
           <select
             value={month}
             onChange={(e) => setMonth(e.target.value)}
@@ -90,12 +96,21 @@ const DailyOrders = () => {
               itemStyle={{ color: "#E5E7EB" }}
             />
             <Legend />
-            <Line
-              type="monotone"
-              dataKey="orders"
-              stroke="#8B5CF6"
-              strokeWidth={2}
-            />
+            {isOverview ? (
+              <Line
+                type="monotone"
+                dataKey="Doanh_so"
+                stroke="#8B5CF6"
+                strokeWidth={2}
+              />
+            ) : (
+              <Line
+                type="monotone"
+                dataKey="Don_hang"
+                stroke="#8B5CF6"
+                strokeWidth={2}
+              />
+            )}
           </LineChart>
         </ResponsiveContainer>
       </div>
