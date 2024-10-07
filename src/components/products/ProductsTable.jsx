@@ -226,7 +226,7 @@ const ProductsTable = () => {
           <SearchBar
             searchTerm={searchTerm}
             handleSearch={handleSearch}
-            placeholder="Tìm kiếm danh mục..."
+            placeholder="Tìm kiếm sản phẩm..."
           />
         </div>
         <div className="overflow-x-auto">

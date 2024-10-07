@@ -14,6 +14,8 @@ import { useSelector } from "react-redux";
 import { OrderProvider } from "./contexts/OrderContext";
 import { ProductProvider } from "./contexts/ProductContext";
 import { CategoryProvider } from "./contexts/CategoryContext";
+import PromotionsProgramPage from "./pages/PromotionsProgramPage";
+import { PromotionsProvider } from "./contexts/PromotionsContext";
 
 function App() {
   const isAdmin = useSelector((state) => state.auth.login?.currentAdmin?.admin);
@@ -69,6 +71,14 @@ function App() {
                     <ProductProvider>
                       <ProductsPage />
                     </ProductProvider>
+                  }
+                />
+                <Route
+                  path="/promotion/program"
+                  element={
+                    <PromotionsProvider>
+                      <PromotionsProgramPage />
+                    </PromotionsProvider>
                   }
                 />
                 <Route path="/users" element={<UsersPage />} />

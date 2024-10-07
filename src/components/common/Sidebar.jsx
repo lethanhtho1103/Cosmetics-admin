@@ -8,6 +8,7 @@ import {
   Users,
   ChevronDown,
   ChevronUp,
+  GiftIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -43,6 +44,21 @@ const SIDEBAR_ITEMS = [
       },
     ],
   },
+  {
+    name: "Khuyến Mãi",
+    icon: GiftIcon,
+    color: "orange",
+    subItems: [
+      {
+        name: "Chương trình khuyến mãi",
+        href: "/promotion/program",
+      },
+      {
+        name: "Sản phẩm khuyến mãi",
+        href: "/promotion/product",
+      },
+    ],
+  },
   { name: "Người Dùng", icon: Users, color: "#EC4899", href: "/users" },
   { name: "Doanh Số", icon: DollarSign, color: "#10B981", href: "/sales" },
   { name: "Đơn Hàng", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
@@ -56,6 +72,10 @@ const Sidebar = () => {
 
   const isSubItemActive = (subItems) => {
     return subItems?.some((subItem) => location.pathname === subItem.href);
+  };
+
+  const handleSubMenuToggle = (itemName) => {
+    setOpenSubMenu((prev) => (prev === itemName ? null : itemName));
   };
 
   return (
@@ -81,18 +101,14 @@ const Sidebar = () => {
               location.pathname === item.href || isSubItemActive(item.subItems);
 
             return (
-              <div key={item.href}>
+              <div key={item.name}>
                 <Link
                   to={item.href}
-                  onClick={() =>
-                    setOpenSubMenu(
-                      item.name === "Danh Mục Sản Phẩm"
-                        ? openSubMenu === item.name
-                          ? null
-                          : item.name
-                        : null
-                    )
-                  }
+                  onClick={() => {
+                    if (item.subItems) {
+                      handleSubMenuToggle(item.name);
+                    }
+                  }}
                 >
                   <motion.div
                     className={`flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2 ${
@@ -119,7 +135,7 @@ const Sidebar = () => {
                     {/* Dropdown arrow */}
                     {item.subItems && (
                       <span className="ml-2">
-                        {openSubMenu === "Danh Mục Sản Phẩm" ? (
+                        {openSubMenu === item.name ? (
                           <ChevronUp size={16} />
                         ) : (
                           <ChevronDown size={16} />
@@ -128,8 +144,8 @@ const Sidebar = () => {
                     )}
                   </motion.div>
                 </Link>
-                {/* Render sub-items if the item is "Danh Mục Sản Phẩm" and the submenu is open */}
-                {item.subItems && openSubMenu === "Danh Mục Sản Phẩm" && (
+                {/* Render sub-items if the submenu is open */}
+                {item.subItems && openSubMenu === item.name && (
                   <div className="ml-6">
                     {item.subItems.map((subItem) => (
                       <Link key={subItem.href} to={subItem.href}>
@@ -150,7 +166,6 @@ const Sidebar = () => {
                                 transition={{ duration: 0.2, delay: 0.3 }}
                               >
                                 • {subItem.name}{" "}
-                                {/* Add bullet before sub-item */}
                               </motion.span>
                             )}
                           </AnimatePresence>
