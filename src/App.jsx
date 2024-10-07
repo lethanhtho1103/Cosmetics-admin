@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 import { OrderProvider } from "./contexts/OrderContext";
 import { ProductProvider } from "./contexts/ProductContext";
 import { CategoryProvider } from "./contexts/CategoryContext";
-import PromotionsProgramPage from "./pages/PromotionsProgramPage";
+import PromotionsPage from "./pages/PromotionsPage";
 import { PromotionsProvider } from "./contexts/PromotionsContext";
 
 function App() {
@@ -77,7 +77,7 @@ function App() {
                   path="/promotion/program"
                   element={
                     <PromotionsProvider>
-                      <PromotionsProgramPage />
+                      <PromotionsPage />
                     </PromotionsProvider>
                   }
                 />

@@ -19,7 +19,6 @@ const OverviewPage = () => {
   const handleGetStatistics = async () => {
     const res = await statisticsService.getStatistics();
     setStatistics(res.data);
-    console.log(statistics);
   };
 
   useEffect(() => {

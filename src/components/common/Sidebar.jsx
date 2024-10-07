@@ -50,11 +50,11 @@ const SIDEBAR_ITEMS = [
     color: "orange",
     subItems: [
       {
-        name: "Chương trình khuyến mãi",
+        name: "Chương Trình Khuyến Mãi",
         href: "/promotion/program",
       },
       {
-        name: "Sản phẩm khuyến mãi",
+        name: "Sản Phẩm Khuyến Mãi",
         href: "/promotion/product",
       },
     ],

@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 import SearchBar from "../common/SearchBar";
 import TableHeader from "../common/TableHeader";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
-import categoryService from "../../services/categoryService";
 import { toast } from "react-toastify";
 import TablePagination from "@mui/material/TablePagination";
 import PromotionsContext from "../../contexts/PromotionsContext";
 import { Edit, Trash2 } from "lucide-react";
+import AddPromotionModal from "./AddPromotionModal";
+import promotionsService from "../../services/promotionsService";
 
 const PromotionTable = () => {
   const { promotions, handleGetAllPromotion, handleShowEditPromotion } =
@@ -18,7 +19,7 @@ const PromotionTable = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [promotionToDelete, setPromotionToDelete] = useState(null);
 
   useEffect(() => {
     setFilteredCategories(promotions);
@@ -54,8 +55,8 @@ const PromotionTable = () => {
     setFilteredCategories(
       term === ""
         ? promotions
-        : promotions.filter((category) =>
-            category.name.toLowerCase().includes(term)
+        : promotions.filter((promotion) =>
+            promotion.name.toLowerCase().includes(term)
           )
     );
   };
@@ -77,9 +78,9 @@ const PromotionTable = () => {
     });
   };
 
-  const handleDelete = async (categoryId) => {
+  const handleDelete = async (promotionId) => {
     try {
-      const res = await categoryService.deleteCategory1(categoryId);
+      const res = await promotionsService.deletePromotion(promotionId);
       toast.success(res.message);
       handleGetAllPromotion();
       if (currentPage > 0 && filteredCategories.length === 1) {
@@ -90,19 +91,19 @@ const PromotionTable = () => {
     }
   };
 
-  const openDeleteModal = (category) => {
-    setCategoryToDelete(category);
+  const openDeleteModal = (promotion) => {
+    setPromotionToDelete(promotion);
     setIsModalOpen(true);
   };
 
   const closeDeleteModal = () => {
     setIsModalOpen(false);
-    setCategoryToDelete(null);
+    setPromotionToDelete(null);
   };
 
   const confirmDelete = () => {
-    if (categoryToDelete) {
-      handleDelete(categoryToDelete._id);
+    if (promotionToDelete) {
+      handleDelete(promotionToDelete._id);
       closeDeleteModal();
     }
   };
@@ -123,7 +124,7 @@ const PromotionTable = () => {
 
   return (
     <>
-      {/* <AddCategoryModal /> */}
+      <AddPromotionModal />
       <motion.div
         className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
         initial={{ opacity: 0, y: 20 }}
@@ -148,45 +149,45 @@ const PromotionTable = () => {
               handleSort={handleSort}
             />
             <tbody className="divide-y divide-gray-700">
-              {currentPromotions?.map((category, index) => (
-                <tr key={category._id}>
+              {currentPromotions?.map((promotion, index) => (
+                <tr key={promotion._id}>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
                     {index + 1 + currentPage * rowsPerPage}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {category.name}
+                    {promotion.name}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {category.discount_type === "buy_one_get_one"
+                    {promotion.discount_type === "buy_one_get_one"
                       ? "Mua 1 tặng 1"
-                      : category.discount_type === "percent"
+                      : promotion.discount_type === "percent"
                       ? "Phần Trăm"
-                      : category.discount_type}
+                      : promotion.discount_type}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {category?.discount_value === "percent"
+                    {promotion?.discount_value === "percent"
                       ? "Mua 1 tặng 1"
-                      : category?.discount_value}
+                      : promotion?.discount_value}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {new Date(category.start_date).toLocaleDateString()}
+                    {new Date(promotion.start_date).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {new Date(category.end_date).toLocaleDateString()}
+                    {new Date(promotion.end_date).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {translateStatus(category.status)}
+                    {translateStatus(promotion.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap flex text-sm text-gray-300">
                     <button
                       className="text-indigo-400 hover:text-indigo-300 mr-2"
-                      onClick={() => handleShowEditPromotion(category)}
+                      onClick={() => handleShowEditPromotion(promotion?._id)}
                     >
                       <Edit size={18} />
                     </button>
                     <button
                       className="text-red-600 hover:text-red-900"
-                      onClick={() => openDeleteModal(category)}
+                      onClick={() => openDeleteModal(promotion)}
                     >
                       <Trash2 size={20} />
                     </button>

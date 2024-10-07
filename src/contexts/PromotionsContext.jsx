@@ -8,13 +8,12 @@ export const PromotionsProvider = ({ children }) => {
   const [modalOpenAdd, setModalOpenAdd] = useState(false);
   const [modalOpenEdit, setModalOpenEdit] = useState(false);
   const [promotions, setPromotions] = useState();
-
-  const [product, setProduct] = useState(null);
+  const [promotion, setPromotion] = useState(null);
 
   const handleShowEditPromotion = async (id) => {
     try {
       const res = await promotionsService.getAllPromotionsById(id);
-      setProduct(res.data);
+      setPromotion(res);
       setModalOpenEdit(true);
     } catch (error) {
       toast.error("Lỗi khi lấy thông tin khuyễn mãi");
@@ -23,7 +22,7 @@ export const PromotionsProvider = ({ children }) => {
 
   const handleShowAddPromotion = async () => {
     try {
-      setProduct(null);
+      setPromotion(null);
       setModalOpenAdd(true);
     } catch (error) {
       toast.error("Lỗi khi lấy thông tin khuyễn mãi");
@@ -49,7 +48,7 @@ export const PromotionsProvider = ({ children }) => {
       value={{
         modalOpenAdd,
         modalOpenEdit,
-        product,
+        promotion,
         promotions,
         closeModal,
         handleGetAllPromotion,
