@@ -7,14 +7,14 @@ import { toast } from "react-toastify";
 import TablePagination from "@mui/material/TablePagination";
 import PromotionsContext from "../../contexts/PromotionsContext";
 import { Edit, Trash2 } from "lucide-react";
-import AddPromotionModal from "./AddPromotionModal";
 import promotionsService from "../../services/promotionsService";
+import AddPromotionalProductModal from "./AddPromotionalProductModal";
 
 const PromotionalProductTable = () => {
   const {
     promotionalProducts,
     handleGetAllPromotion,
-    handleShowEditPromotion,
+    handleShowEditPromotionalProduct,
   } = useContext(PromotionsContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCategories, setFilteredCategories] =
@@ -81,7 +81,7 @@ const PromotionalProductTable = () => {
 
   const handleDelete = async (promotionId) => {
     try {
-      const res = await promotionsService.deletePromotion(promotionId);
+      const res = await promotionsService.deletePromotionalProduct(promotionId);
       toast.success(res.message);
       handleGetAllPromotion();
       if (currentPage > 0 && filteredCategories.length === 1) {
@@ -125,7 +125,7 @@ const PromotionalProductTable = () => {
 
   return (
     <>
-      <AddPromotionModal />
+      <AddPromotionalProductModal />
       <motion.div
         className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
         initial={{ opacity: 0, y: 20 }}
@@ -178,7 +178,9 @@ const PromotionalProductTable = () => {
                   <td className="px-6 py-4 whitespace-nowrap flex text-sm text-gray-300">
                     <button
                       className="text-indigo-400 hover:text-indigo-300 mr-2"
-                      onClick={() => handleShowEditPromotion(promotion?._id)}
+                      onClick={() =>
+                        handleShowEditPromotionalProduct(promotion?._id)
+                      }
                     >
                       <Edit size={18} />
                     </button>

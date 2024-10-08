@@ -7,9 +7,12 @@ const PromotionsContext = createContext();
 export const PromotionsProvider = ({ children }) => {
   const [modalOpenAdd, setModalOpenAdd] = useState(false);
   const [modalOpenEdit, setModalOpenEdit] = useState(false);
+  const [modalOpenAddProduct, setModalOpenAddProduct] = useState(false);
+  const [modalOpenEditProduct, setModalOpenEditProduct] = useState(false);
   const [promotions, setPromotions] = useState([]);
   const [promotionalProducts, setPromotionalProducts] = useState([]);
   const [promotion, setPromotion] = useState(null);
+  const [promotionalProduct, setPromotionalProduct] = useState(null);
 
   const handleShowEditPromotion = async (id) => {
     try {
@@ -26,9 +29,26 @@ export const PromotionsProvider = ({ children }) => {
     setModalOpenAdd(true);
   };
 
+  const handleShowEditPromotionalProduct = async (id) => {
+    try {
+      const res = await promotionsService.getAllPromotionalProductById(id);
+      setPromotionalProduct(res);
+      setModalOpenEditProduct(true);
+    } catch (error) {
+      toast.error("Lỗi khi lấy thông tin khuyễn mãi");
+    }
+  };
+
+  const handleShowAddPromotionalProduct = () => {
+    setPromotionalProduct(null);
+    setModalOpenAddProduct(true);
+  };
+
   const closeModal = useCallback(() => {
     setModalOpenEdit(false);
     setModalOpenAdd(false);
+    setModalOpenEditProduct(false);
+    setModalOpenAddProduct(false);
   }, []);
 
   const fetchData = async () => {
@@ -53,8 +73,11 @@ export const PromotionsProvider = ({ children }) => {
     <PromotionsContext.Provider
       value={{
         modalOpenAdd,
+        modalOpenAddProduct,
         modalOpenEdit,
+        modalOpenEditProduct,
         promotion,
+        promotionalProduct,
         promotions,
         promotionalProducts,
         closeModal,
@@ -62,6 +85,8 @@ export const PromotionsProvider = ({ children }) => {
         handleGetAllPromotionalProducts: fetchData,
         handleShowEditPromotion,
         handleShowAddPromotion,
+        handleShowEditPromotionalProduct,
+        handleShowAddPromotionalProduct,
       }}
     >
       {children}
