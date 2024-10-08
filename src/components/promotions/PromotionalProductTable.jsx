@@ -10,11 +10,15 @@ import { Edit, Trash2 } from "lucide-react";
 import AddPromotionModal from "./AddPromotionModal";
 import promotionsService from "../../services/promotionsService";
 
-const PromotionTable = () => {
-  const { promotions, handleGetAllPromotion, handleShowEditPromotion } =
-    useContext(PromotionsContext);
+const PromotionalProductTable = () => {
+  const {
+    promotionalProducts,
+    handleGetAllPromotion,
+    handleShowEditPromotion,
+  } = useContext(PromotionsContext);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredCategories, setFilteredCategories] = useState(promotions);
+  const [filteredCategories, setFilteredCategories] =
+    useState(promotionalProducts);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -22,16 +26,13 @@ const PromotionTable = () => {
   const [promotionToDelete, setPromotionToDelete] = useState(null);
 
   useEffect(() => {
-    setFilteredCategories(promotions);
-  }, [promotions]);
+    setFilteredCategories(promotionalProducts);
+  }, [promotionalProducts]);
 
   const columns = [
     { key: "index", label: "STT", sortable: false },
-    { key: "name", label: "Tên", sortable: true },
-    { key: "discount_type", label: "Loại Khuyến Mãi", sortable: true },
-    { key: "discount_value", label: "Giá Khuyến Mãi", sortable: true },
-    { key: "start_date", label: "Ngày Bắt Đầu", sortable: true },
-    { key: "end_date", label: "Ngày Kết Thúc", sortable: true },
+    { key: "name", label: "Tên Sản Phẩm", sortable: true },
+    { key: "discount_type", label: "Tên khuyễn mãi", sortable: true },
     { key: "status", label: "Trạng Thái", sortable: true },
     { key: "actions", label: "Hành Động", sortable: false },
   ];
@@ -54,9 +55,9 @@ const PromotionTable = () => {
     setSearchTerm(term);
     setFilteredCategories(
       term === ""
-        ? promotions
-        : promotions.filter((promotion) =>
-            promotion.name.toLowerCase().includes(term)
+        ? promotionalProducts
+        : promotionalProducts.filter((promotion) =>
+            promotion?.product_id.name.toLowerCase().includes(term)
           )
     );
   };
@@ -133,7 +134,7 @@ const PromotionTable = () => {
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-100 capitalize">
-            Danh sách khuyến mãi
+            Danh sách sản phẩm khuyễn mãi
           </h2>
           <SearchBar
             searchTerm={searchTerm}
@@ -155,37 +156,23 @@ const PromotionTable = () => {
                     {index + 1 + currentPage * rowsPerPage}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {promotion.name}
+                    {promotion?.product_id.name}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {promotion.discount_type === "buy_one_get_one"
-                      ? "Mua 1 tặng 1"
-                      : promotion.discount_type === "percent"
-                      ? "Phần Trăm"
-                      : promotion.discount_type}
+                    {promotion?.promotion_id.name}
                   </td>
-                  <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {promotion?.discount_value === "percent"
-                      ? "Mua 1 tặng 1"
-                      : promotion?.discount_value}
-                  </td>
-                  <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {new Date(promotion.start_date).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {new Date(promotion.end_date).toLocaleDateString()}
-                  </td>
+
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        promotion.status === "active"
+                        promotion?.promotion_id.status === "active"
                           ? "bg-green-100 text-green-800"
-                          : promotion.status === "inactive"
+                          : promotion?.promotion_id.status === "inactive"
                           ? "bg-yellow-100 text-yellow-800"
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {translateStatus(promotion.status)}
+                      {translateStatus(promotion?.promotion_id.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap flex text-sm text-gray-300">
@@ -242,4 +229,4 @@ const PromotionTable = () => {
   );
 };
 
-export default PromotionTable;
+export default PromotionalProductTable;

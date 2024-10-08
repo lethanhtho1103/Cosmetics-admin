@@ -112,7 +112,7 @@ const Sidebar = () => {
                 >
                   <motion.div
                     className={`flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2 ${
-                      isActive ? "text-red-500" : "text-white"
+                      isActive ? "text-green-500" : "text-white"
                     }`}
                   >
                     <item.icon
@@ -152,7 +152,7 @@ const Sidebar = () => {
                         <motion.div
                           className={`flex items-center p-2 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-1 ${
                             location.pathname === subItem.href
-                              ? "text-red-500"
+                              ? "text-green-500"
                               : "text-white"
                           }`}
                         >

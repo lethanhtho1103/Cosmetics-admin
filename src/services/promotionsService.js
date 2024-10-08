@@ -66,6 +66,15 @@ const promotionsService = {
       console.error(error);
     }
   },
+
+  async getAllPromotionalProducts() {
+    try {
+      const res = await axios.get("/api/products/promotions");
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 export default promotionsService;

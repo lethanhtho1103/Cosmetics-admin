@@ -7,7 +7,8 @@ const PromotionsContext = createContext();
 export const PromotionsProvider = ({ children }) => {
   const [modalOpenAdd, setModalOpenAdd] = useState(false);
   const [modalOpenEdit, setModalOpenEdit] = useState(false);
-  const [promotions, setPromotions] = useState();
+  const [promotions, setPromotions] = useState([]);
+  const [promotionalProducts, setPromotionalProducts] = useState([]);
   const [promotion, setPromotion] = useState(null);
 
   const handleShowEditPromotion = async (id) => {
@@ -20,13 +21,9 @@ export const PromotionsProvider = ({ children }) => {
     }
   };
 
-  const handleShowAddPromotion = async () => {
-    try {
-      setPromotion(null);
-      setModalOpenAdd(true);
-    } catch (error) {
-      toast.error("Lỗi khi lấy thông tin khuyễn mãi");
-    }
+  const handleShowAddPromotion = () => {
+    setPromotion(null);
+    setModalOpenAdd(true);
   };
 
   const closeModal = useCallback(() => {
@@ -34,13 +31,22 @@ export const PromotionsProvider = ({ children }) => {
     setModalOpenAdd(false);
   }, []);
 
-  const handleGetAllPromotion = async () => {
-    const res = await promotionsService.getAllPromotions();
-    setPromotions(res);
+  const fetchData = async () => {
+    try {
+      const [promotionsData, promotionalProductsData] = await Promise.all([
+        promotionsService.getAllPromotions(),
+        promotionsService.getAllPromotionalProducts(),
+      ]);
+
+      setPromotions(promotionsData);
+      setPromotionalProducts(promotionalProductsData);
+    } catch (error) {
+      toast.error("Lỗi khi tải thông tin khuyến mãi");
+    }
   };
 
   useEffect(() => {
-    handleGetAllPromotion();
+    fetchData();
   }, []);
 
   return (
@@ -50,8 +56,10 @@ export const PromotionsProvider = ({ children }) => {
         modalOpenEdit,
         promotion,
         promotions,
+        promotionalProducts,
         closeModal,
-        handleGetAllPromotion,
+        handleGetAllPromotion: fetchData,
+        handleGetAllPromotionalProducts: fetchData,
         handleShowEditPromotion,
         handleShowAddPromotion,
       }}
