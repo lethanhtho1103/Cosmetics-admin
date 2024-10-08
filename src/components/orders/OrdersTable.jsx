@@ -1,8 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Eye, ChevronUp, ChevronDown } from "lucide-react";
+import { Search, Eye } from "lucide-react";
 import OrderContext from "../../contexts/OrderContext";
 import ViewOrder from "./ViewOrder";
+import TableHeader from "../common/TableHeader";
 
 const OrdersTable = () => {
   const { orders } = useContext(OrderContext);
@@ -20,11 +21,19 @@ const OrdersTable = () => {
   };
 
   const handleTotalPriceOrder = (order) => {
-    const result = order?.reduce((total, currentItem) => {
+    return order?.reduce((total, currentItem) => {
       return total + currentItem?.unit_price * currentItem?.quantity;
     }, 0);
-    return result;
   };
+
+  const columns = [
+    { key: "index", label: "STT", sortable: false },
+    { key: "username", label: "Tên", sortable: true },
+    { key: "totalPrice", label: "Tổng tiền", sortable: true },
+    { key: "status", label: "Trạng thái", sortable: true },
+    { key: "orderDate", label: "Ngày đặt", sortable: true },
+    { key: "actions", label: "Hành động", sortable: false },
+  ];
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -123,85 +132,11 @@ const OrdersTable = () => {
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                STT
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("username")}
-              >
-                <div className="flex items-center">
-                  Tên
-                  {sortConfig.key === "username" && (
-                    <span className="ml-2 text-blue-400">
-                      {sortConfig.direction === "asc" ? (
-                        <ChevronUp />
-                      ) : (
-                        <ChevronDown />
-                      )}
-                    </span>
-                  )}
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("totalPrice")}
-              >
-                <div className="flex items-center">
-                  Tổng tiền
-                  {sortConfig.key === "totalPrice" && (
-                    <span className="ml-2 text-blue-400">
-                      {sortConfig.direction === "asc" ? (
-                        <ChevronUp />
-                      ) : (
-                        <ChevronDown />
-                      )}
-                    </span>
-                  )}
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("status")}
-              >
-                <div className="flex items-center">
-                  Trạng thái
-                  {sortConfig.key === "status" && (
-                    <span className="ml-2 text-blue-400">
-                      {sortConfig.direction === "asc" ? (
-                        <ChevronUp />
-                      ) : (
-                        <ChevronDown />
-                      )}
-                    </span>
-                  )}
-                </div>
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("orderDate")}
-              >
-                <div className="flex items-center">
-                  Ngày đặt
-                  {sortConfig.key === "orderDate" && (
-                    <span className="ml-2 text-blue-400">
-                      {sortConfig.direction === "asc" ? (
-                        <ChevronUp />
-                      ) : (
-                        <ChevronDown />
-                      )}
-                    </span>
-                  )}
-                </div>
-              </th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Hành động
-              </th>
-            </tr>
-          </thead>
-
+          <TableHeader
+            columns={columns}
+            sortConfig={sortConfig}
+            handleSort={handleSort}
+          />
           <tbody className="divide divide-gray-700">
             {filteredOrders?.map((order, index) => (
               <motion.tr
@@ -243,7 +178,7 @@ const OrdersTable = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
                   {formatDate(order.order_date)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100 text-center flex justify-center">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100 flex justify-start">
                   <Eye
                     className="cursor-pointer text-blue-500 hover:text-blue-700"
                     onClick={() => handleShowViewOrder(order._id)}
