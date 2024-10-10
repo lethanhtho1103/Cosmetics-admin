@@ -20,7 +20,6 @@ const AddPromotionalProductModal = () => {
   const [products, setProducts] = useState([]);
   const [errors, setErrors] = useState({});
 
-  // Get all products and set them
   useEffect(() => {
     const handleGetAllProduct = async () => {
       try {
@@ -38,7 +37,6 @@ const AddPromotionalProductModal = () => {
     }
   }, [modalOpenEditProduct, promotionalProduct]);
 
-  // Dropdown options memoization to prevent unnecessary re-renders
   const promotionOptions = useMemo(
     () =>
       promotions.map((promotion) => ({
@@ -57,7 +55,6 @@ const AddPromotionalProductModal = () => {
     [products]
   );
 
-  // Handle modal close and reset form
   const handleCloseModal = () => {
     closeModal();
     setPromotionId("");
@@ -65,7 +62,6 @@ const AddPromotionalProductModal = () => {
     setErrors({});
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     const validationErrors = {};
     if (!promotionId)

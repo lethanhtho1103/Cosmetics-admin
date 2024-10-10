@@ -170,10 +170,24 @@ const PromotionTable = () => {
                       : promotion?.discount_value}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {new Date(promotion.start_date).toLocaleDateString()}
+                    {new Date(promotion.start_date).toLocaleString("vi-VN", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    })}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
-                    {new Date(promotion.end_date).toLocaleDateString()}
+                    {new Date(promotion.end_date).toLocaleString("vi-VN", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    })}
                   </td>
                   <td className="px-6 py-4 capitalize text-sm text-gray-300">
                     <span

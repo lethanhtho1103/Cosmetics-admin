@@ -111,7 +111,6 @@ const AddPromotionModal = () => {
           end_date,
         });
       }
-
       handleGetAllPromotion();
       toast.success(res.message);
       setName("");
@@ -224,14 +223,14 @@ const AddPromotionModal = () => {
 
             <div className="relative">
               <label htmlFor="start_date" className="block text-gray-700">
-                Ngày Bắt Đầu
+                Ngày Bắt Đầu & Giờ
               </label>
               <input
                 id="start_date"
-                type="date"
+                type="datetime-local"
                 name="start_date"
                 value={start_date}
-                min={today} // Set min to today
+                min={today} // Set min to current date and time
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
                   errors.start_date ? "border-red-500" : "border-gray-300"
@@ -244,14 +243,14 @@ const AddPromotionModal = () => {
 
             <div className="relative">
               <label htmlFor="end_date" className="block text-gray-700">
-                Ngày Kết Thúc
+                Ngày Kết Thúc & Giờ
               </label>
               <input
                 id="end_date"
-                type="date"
+                type="datetime-local"
                 name="end_date"
                 value={end_date}
-                min={today}
+                min={start_date || today} // Ensure end date is after start date
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800 ${
                   errors.end_date ? "border-red-500" : "border-gray-300"
