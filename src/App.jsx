@@ -17,6 +17,7 @@ import { CategoryProvider } from "./contexts/CategoryContext";
 import PromotionsPage from "./pages/PromotionsPage";
 import { PromotionsProvider } from "./contexts/PromotionsContext";
 import PromotionalProductPage from "./pages/PromotionalProductPage";
+import ContactsPage from "./pages/ContactsPage";
 
 function App() {
   const isAdmin = useSelector((state) => state.auth.login?.currentAdmin?.admin);
@@ -91,6 +92,7 @@ function App() {
                   }
                 />
                 <Route path="/users" element={<UsersPage />} />
+                <Route path="/contacts" element={<ContactsPage />} />
                 <Route path="/sales" element={<SalesPage />} />
                 <Route
                   path="/orders"

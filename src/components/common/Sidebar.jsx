@@ -8,6 +8,7 @@ import {
   Users,
   ChevronDown,
   ChevronUp,
+  Mail,
   GiftIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -62,6 +63,7 @@ const SIDEBAR_ITEMS = [
   { name: "Người Dùng", icon: Users, color: "#EC4899", href: "/users" },
   { name: "Doanh Số", icon: DollarSign, color: "#10B981", href: "/sales" },
   { name: "Đơn Hàng", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
+  { name: "Liên Hệ", icon: Mail, color: "#3B82F6", href: "/contacts" },
   { name: "Tài khoản", icon: Settings, color: "#6EE7B7", href: "/settings" },
 ];
 
