@@ -21,18 +21,29 @@ const OverviewPage = () => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
   const handleGetStatistics = async () => {
-    const res = await statisticsService.getStatistics();
-    setStatistics(res.data);
+    return statisticsService.getStatistics();
   };
 
   const handleGetCategoriesTopSales = async () => {
-    const res = await statisticsService.getCategoriesTopSales();
-    setCategoriesTopSales(res.data);
+    return statisticsService.getCategoriesTopSales();
   };
 
   useEffect(() => {
-    handleGetStatistics();
-    handleGetCategoriesTopSales();
+    const fetchData = async () => {
+      try {
+        const [statisticsRes, categoriesTopSalesRes] = await Promise.all([
+          handleGetStatistics(),
+          handleGetCategoriesTopSales(),
+        ]);
+
+        setStatistics(statisticsRes.data);
+        setCategoriesTopSales(categoriesTopSalesRes.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -14,29 +14,32 @@ import Select from "@mui/material/Select";
 import orderService from "../../services/orderService";
 import { baseUrl } from "../../axios";
 import { toast } from "react-toastify";
+import OrderContext from "../../contexts/OrderContext";
 
 function ViewOrder({ orderId, formatDate, onClose }) {
+  const { handleGetAllOrders } = useContext(OrderContext);
   const [order, setOrder] = useState({});
   const [selectedStatus, setSelectedStatus] = useState("");
 
   const formatNumber = (num) =>
     num?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-  const handleGetAllOrder = async () => {
+  const handleGetOrderById = async () => {
     const res = await orderService.getOrderById(orderId);
     setOrder(res?.data);
-    setSelectedStatus(res?.data?.status || ""); // Thiết lập giá trị trạng thái khi nhận dữ liệu
+    setSelectedStatus(res?.data?.status || "");
   };
 
   useEffect(() => {
-    handleGetAllOrder();
+    handleGetOrderById();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 
   const handleUpdateStatusOrder = async () => {
     await orderService.updateStatus(orderId, selectedStatus);
-    await handleGetAllOrder();
+    await handleGetOrderById();
     toast.success("Cập nhật trạng thái đơn hàng thành công.");
+    handleGetAllOrders();
   };
 
   return (
@@ -234,21 +237,32 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                       alignItems: "center",
                     }}
                   >
-                    <Select
-                      value={selectedStatus}
-                      onChange={(e) => setSelectedStatus(e.target.value)}
-                      size="small"
+                    <Typography
                       sx={{
-                        marginRight: "12px",
-                        borderRadius: "4px",
-                        padding: "0 4px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
                       }}
                     >
-                      <MenuItem value="">Chọn trạng thái</MenuItem>
-                      <MenuItem value="shipped">Đang vận chuyển</MenuItem>
-                      <MenuItem value="delivered">Hoàn thành</MenuItem>
-                      <MenuItem value="denied">Hủy đơn</MenuItem>
-                    </Select>
+                      <Typography sx={{ mr: 1, fontWeight: "500" }}>
+                        Trạng thái:
+                      </Typography>
+                      <Select
+                        value={selectedStatus}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        size="small"
+                        sx={{
+                          marginRight: "12px",
+                          borderRadius: "4px",
+                          padding: "0 4px",
+                        }}
+                      >
+                        <MenuItem value="shipped">Đang vận chuyển</MenuItem>
+                        <MenuItem value="delivered">Hoàn thành</MenuItem>
+                        <MenuItem value="denied">Hủy đơn</MenuItem>
+                      </Select>
+                    </Typography>
+
                     <Button
                       size="small"
                       variant="contained"

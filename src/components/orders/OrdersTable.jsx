@@ -12,6 +12,9 @@ const OrdersTable = () => {
   const [orderId, setOrderId] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
 
+  const formatNumber = (num) =>
+    num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
   const handleShowViewOrder = (id) => {
     setOrderId(id);
   };
@@ -152,7 +155,7 @@ const OrdersTable = () => {
                   {order?.user_id?.username}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                  ${handleTotalPriceOrder(order?.orderDetails)}
+                  {formatNumber(handleTotalPriceOrder(order?.orderDetails))}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <span
