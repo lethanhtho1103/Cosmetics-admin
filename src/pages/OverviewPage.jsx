@@ -1,4 +1,4 @@
-import { ShoppingBag, Users, Zap } from "lucide-react";
+import { Package, ShoppingBag, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
@@ -12,7 +12,11 @@ const OverviewPage = () => {
     totalRevenue: 0,
     totalProducts: 0,
     totalUsers: 0,
+    totalOrders: 0,
   });
+
+  const [categoriesTopSales, setCategoriesTopSales] = useState([]);
+
   function formatNumberWithCommas(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
@@ -21,8 +25,14 @@ const OverviewPage = () => {
     setStatistics(res.data);
   };
 
+  const handleGetCategoriesTopSales = async () => {
+    const res = await statisticsService.getCategoriesTopSales();
+    setCategoriesTopSales(res.data);
+  };
+
   useEffect(() => {
     handleGetStatistics();
+    handleGetCategoriesTopSales();
   }, []);
 
   return (
@@ -54,13 +64,19 @@ const OverviewPage = () => {
             value={statistics?.totalProducts}
             color="#EC4899"
           />
+          <StatCard
+            name="Tổng Đơn Hàng"
+            icon={Package}
+            value={statistics.totalOrders}
+            color="#F59E0B"
+          />
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
           <DailyOrders isOverview={true} />
         </div>
         <div className="grid  mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
-          <CategoryDistributionChart />
+          <CategoryDistributionChart categoriesTopSales={categoriesTopSales} />
         </div>
       </main>
     </div>

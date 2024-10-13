@@ -9,6 +9,16 @@ const statisticsService = {
       throw new Error(error.response?.data?.message || "Thất bại");
     }
   },
+
+  async getCategoriesTopSales() {
+    try {
+      const res = await axios.get("/api/statistics/top-categories-sales");
+      return res;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Thất bại");
+    }
+  },
+
   async getOrderStatisticsByMonth({ year, month }) {
     try {
       const res = await axios.get("/api/statistics/order/month", {
