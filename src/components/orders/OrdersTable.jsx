@@ -155,7 +155,7 @@ const OrdersTable = () => {
                   {order?.user_id?.username}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                  {formatNumber(handleTotalPriceOrder(order?.orderDetails))}
+                  {formatNumber(handleTotalPriceOrder(order?.orderDetails))}đ
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <span

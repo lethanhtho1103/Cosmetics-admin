@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import UsersTable from "../components/users/UsersTable";
-import UserDemographicsChart from "../components/users/UserDemographicsChart";
 import { useEffect, useState } from "react";
 import authService from "../services/authService";
 
@@ -83,10 +82,6 @@ const UsersPage = () => {
         </motion.div>
 
         <UsersTable users={users} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          <UserDemographicsChart />
-        </div>
       </main>
     </div>
   );

@@ -63,20 +63,34 @@ const PromotionalProductTable = () => {
   };
 
   const handleSort = (key) => {
-    const direction =
-      sortConfig.key === key && sortConfig.direction === "ascending"
-        ? "descending"
-        : "ascending";
-
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
     setSortConfig({ key, direction });
 
-    setFilteredCategories((prev) => {
-      return [...prev].sort((a, b) => {
-        if (a[key] < b[key]) return direction === "ascending" ? -1 : 1;
-        if (a[key] > b[key]) return direction === "ascending" ? 1 : -1;
-        return 0;
-      });
+    const sortedPromotions = [...filteredCategories].sort((a, b) => {
+      if (key === "name") {
+        const nameA = a.product_id.name.toLowerCase();
+        const nameB = b.product_id.name.toLowerCase();
+        return direction === "asc"
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
+      } else if (key === "discount_type") {
+        const discountA = a.promotion_id.name.toLowerCase();
+        const discountB = b.promotion_id.name.toLowerCase();
+        return direction === "asc"
+          ? discountA.localeCompare(discountB)
+          : discountB.localeCompare(discountA);
+      } else if (key === "status") {
+        return direction === "asc"
+          ? a.promotion_id.status.localeCompare(b.promotion_id.status)
+          : b.promotion_id.status.localeCompare(a.promotion_id.status);
+      }
+      return 0;
     });
+
+    setFilteredCategories(sortedPromotions);
   };
 
   const handleDelete = async (promotionId) => {

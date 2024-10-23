@@ -159,7 +159,7 @@ const ProductsTable = () => {
   const columns = [
     { label: "Tên", key: "name", sortable: true },
     { label: "Giá", key: "price", sortable: true },
-    { label: "Số lượng", key: "quantity", sortable: true },
+    { label: "Tồn kho", key: "quantity", sortable: true },
     { label: "Thương hiệu", key: "trademark", sortable: true },
     { label: "Xuất xứ", key: "origin", sortable: true },
     { label: "Đã bán", key: "sold_quantity", sortable: true },
@@ -257,7 +257,7 @@ const ProductsTable = () => {
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {formatNumber(product?.price)}
+                    {formatNumber(product?.price)}đ
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {formatNumber(product?.quantity)}

@@ -12,8 +12,10 @@ import {
 } from "recharts";
 import statisticsService from "../../services/statisticsService";
 
-const DailyOrders = ({ isOverview }) => {
+const DailyOrders = ({ isOverview, formatNumberWithCommas }) => {
   const [ordersStatistics, setOrdersStatistics] = useState([]);
+  const [totalMonthlyRevenue, setTotalMonthlyRevenue] = useState(0);
+
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
 
@@ -23,6 +25,7 @@ const DailyOrders = ({ isOverview }) => {
         year,
         month,
       });
+      setTotalMonthlyRevenue(res.totalMonthlyRevenue);
       const formattedData = res.data.map((item) => {
         const key = isOverview ? "Doanh_so" : "Don_hang";
         return {
@@ -49,9 +52,18 @@ const DailyOrders = ({ isOverview }) => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-5">
-        <h2 className="text-xl font-semibold text-gray-100 capitalize">
-          {isOverview ? "Doanh số" : "Thống kê đơn hàng"}
-        </h2>
+        {isOverview ? (
+          <h2 className="text-xl font-semibold text-gray-100">
+            {`Doanh Thu Tháng ${month}: `}
+            <span className="text-red-500">
+              {formatNumberWithCommas(totalMonthlyRevenue)}đ
+            </span>
+          </h2>
+        ) : (
+          <h2 className="text-xl font-semibold text-gray-100 capitalize">
+            Thống kê đơn hàng
+          </h2>
+        )}
 
         <div>
           <label className="text-gray-200">Năm:</label>

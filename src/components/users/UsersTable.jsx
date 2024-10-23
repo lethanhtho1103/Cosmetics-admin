@@ -158,10 +158,14 @@ const UsersTable = ({ users }) => {
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-white">
-                      {user?.address}, {user?.ward}, {user?.district},{" "}
-                      {user?.province}
-                    </div>
+                    {user?.ward ? (
+                      <div className="text-sm text-white">
+                        {user?.address}, {user?.ward}, {user?.district},{" "}
+                        {user?.province}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-white">Chưa có địa chỉ</div>
+                    )}
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap">

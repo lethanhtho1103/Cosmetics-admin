@@ -84,7 +84,10 @@ const OverviewPage = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
-          <DailyOrders isOverview={true} />
+          <DailyOrders
+            isOverview={true}
+            formatNumberWithCommas={formatNumberWithCommas}
+          />
         </div>
         <div className="grid  mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
           <CategoryDistributionChart categoriesTopSales={categoriesTopSales} />

@@ -1,5 +1,4 @@
 import Header from "../components/common/Header";
-import SalesTrendChart from "../components/products/SalesTrendChart";
 import ProductsTable from "../components/products/ProductsTable";
 import { useContext } from "react";
 import ProductContext from "../contexts/ProductContext";
@@ -28,9 +27,6 @@ const ProductsPage = () => {
           </div>
           <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
             <ProductsTable />
-            <div className="grid grid-col-1 lg:grid-cols-2 gap-8">
-              <SalesTrendChart />
-            </div>
           </main>
         </>
       )}
