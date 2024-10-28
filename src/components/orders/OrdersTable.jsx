@@ -10,7 +10,10 @@ const OrdersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [orderId, setOrderId] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "", direction: "asc" });
+  const [sortConfig, setSortConfig] = useState({
+    key: "",
+    direction: "ascending",
+  });
 
   const formatNumber = (num) =>
     num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -21,12 +24,6 @@ const OrdersTable = () => {
 
   const handleCancelViewOrder = () => {
     setOrderId("");
-  };
-
-  const handleTotalPriceOrder = (order) => {
-    return order?.reduce((total, currentItem) => {
-      return total + currentItem?.unit_price * currentItem?.quantity;
-    }, 0);
   };
 
   const columns = [
@@ -54,9 +51,7 @@ const OrdersTable = () => {
           ? "đang vận chuyển"
           : "đã hủy";
 
-      const totalPrice = handleTotalPriceOrder(order?.orderDetails)
-        .toString()
-        .toLowerCase();
+      const totalPrice = order.total_price.toString().toLowerCase();
       const orderDate = formatDate(order?.order_date).toLowerCase();
       return (
         username.includes(term) ||
@@ -77,30 +72,30 @@ const OrdersTable = () => {
   };
 
   const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
     }
     setSortConfig({ key, direction });
     const sortedOrders = [...filteredOrders].sort((a, b) => {
       if (key === "username") {
         const nameA = a.user_id.username.toLowerCase();
         const nameB = b.user_id.username.toLowerCase();
-        return direction === "asc"
+        return direction === "ascending"
           ? nameA.localeCompare(nameB)
           : nameB.localeCompare(nameA);
       } else if (key === "totalPrice") {
-        const totalA = handleTotalPriceOrder(a.orderDetails);
-        const totalB = handleTotalPriceOrder(b.orderDetails);
-        return direction === "asc" ? totalA - totalB : totalB - totalA;
+        const totalA = a.total_price;
+        const totalB = b.total_price;
+        return direction === "ascending" ? totalA - totalB : totalB - totalA;
       } else if (key === "status") {
-        return direction === "asc"
+        return direction === "ascending"
           ? a.status.localeCompare(b.status)
           : b.status.localeCompare(a.status);
       } else if (key === "orderDate") {
         const dateA = new Date(a.order_date);
         const dateB = new Date(b.order_date);
-        return direction === "asc" ? dateA - dateB : dateB - dateA;
+        return direction === "ascending" ? dateA - dateB : dateB - dateA;
       }
       return 0;
     });
@@ -155,7 +150,7 @@ const OrdersTable = () => {
                   {order?.user_id?.username}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                  {formatNumber(handleTotalPriceOrder(order?.orderDetails))}đ
+                  {formatNumber(order.total_price)}đ
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <span

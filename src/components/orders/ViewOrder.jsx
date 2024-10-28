@@ -203,6 +203,34 @@ function ViewOrder({ orderId, formatDate, onClose }) {
                           {formatNumber(orderDetail?.unit_price)}₫
                         </Typography>
                       </Box>
+                      <Box
+                        sx={{
+                          marginTop: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          disabled
+                          sx={{
+                            fontSize: "12px",
+                            "&.Mui-disabled": {
+                              color: "#26aa99 !important",
+                              borderColor: "#26aa99",
+                            },
+                          }}
+                        >
+                          {order?.shipping_method === "express"
+                            ? "Giao hàng nhanh"
+                            : "Giao hàng tiêu chuẩn"}
+                        </Button>
+                        <Typography sx={{ color: "#000 !important" }}>
+                          {formatNumber(order?.shipping_cost)}₫
+                        </Typography>
+                      </Box>
                     </Grid>
                   </Grid>
                 ))}
