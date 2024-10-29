@@ -1,47 +1,44 @@
 import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
-import { Edit, Trash2 } from "lucide-react";
 import SearchBar from "../common/SearchBar";
 import TableHeader from "../common/TableHeader";
-import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
-import SuppliersContext from "../../contexts/SuppliersContext";
-import categoryService from "../../services/categoryService";
+import ReceiptContext from "../../contexts/ReceiptContext";
 import { toast } from "react-toastify";
 import TablePagination from "@mui/material/TablePagination";
+import receiptService from "../../services/receiptService";
+import ReceiptDetailTable from "./ReceiptDetailTable";
 
-const SupplierTable = () => {
-  const { handleShowEditSupplier, suppliers, handleGetAllSuppliers } =
-    useContext(SuppliersContext);
-
+const ReceiptTable = () => {
+  const { receipts } = useContext(ReceiptContext);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredSuppliers, setFilteredSuppliers] = useState(suppliers);
+  const [filteredReceipts, setFilteredReceipts] = useState(receipts);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [supplierToDelete, setSupplierToDelete] = useState(null);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
 
   useEffect(() => {
-    setFilteredSuppliers(suppliers);
-  }, [suppliers]);
+    setFilteredReceipts(receipts);
+  }, [receipts]);
 
   const columns = [
-    { key: "index", label: "STT", sortable: false },
-    { key: "name", label: "Tên nhà cung cấp", sortable: true },
-    { key: "email", label: "Email", sortable: true },
-    { key: "address", label: "Địa chỉ", sortable: true },
-    { key: "phone", label: "Số điện thoại", sortable: true },
-    { key: "actions", label: "Hành động", sortable: false },
+    { key: "index", label: "Mã phiếu nhập", sortable: false },
+    { key: "supplier_name", label: "Tên nhà cung cấp", sortable: true },
+    { key: "total_price", label: "Tổng giá trị", sortable: true },
+    { key: "createdAt", label: "Ngày nhập", sortable: true },
   ];
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    setFilteredSuppliers(
+    setFilteredReceipts(
       term === ""
-        ? suppliers
-        : suppliers.filter((supplier) =>
-            supplier.name.toLowerCase().includes(term)
+        ? receipts
+        : receipts.filter(
+            (receipt) =>
+              receipt.supplier_id.name.toLowerCase().includes(term) ||
+              receipt._id.toLowerCase().includes(term) || // Tìm theo _id
+              new Date(receipt.createdAt).toLocaleDateString().includes(term) // Tìm theo ngày nhập
           )
     );
   };
@@ -54,43 +51,13 @@ const SupplierTable = () => {
 
     setSortConfig({ key, direction });
 
-    setFilteredSuppliers((prev) => {
+    setFilteredReceipts((prev) => {
       return [...prev].sort((a, b) => {
         if (a[key] < b[key]) return direction === "ascending" ? -1 : 1;
         if (a[key] > b[key]) return direction === "ascending" ? 1 : -1;
         return 0;
       });
     });
-  };
-
-  const handleDelete = async (supplierId) => {
-    try {
-      const res = await categoryService.deleteCategory1(supplierId);
-      toast.success(res.message);
-      handleGetAllSuppliers();
-      if (currentPage > 0 && filteredSuppliers.length === 1) {
-        setCurrentPage((prev) => Math.max(prev - 1, 0));
-      }
-    } catch (error) {
-      toast.error("Lỗi khi xóa");
-    }
-  };
-
-  const openDeleteModal = (supplier) => {
-    setSupplierToDelete(supplier);
-    setIsModalOpen(true);
-  };
-
-  const closeDeleteModal = () => {
-    setIsModalOpen(false);
-    setSupplierToDelete(null);
-  };
-
-  const confirmDelete = () => {
-    if (supplierToDelete) {
-      handleDelete(supplierToDelete._id);
-      closeDeleteModal();
-    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -102,10 +69,19 @@ const SupplierTable = () => {
     setCurrentPage(0);
   };
 
-  const currentSuppliers = filteredSuppliers?.slice(
+  const currentReceipts = filteredReceipts?.slice(
     currentPage * rowsPerPage,
     currentPage * rowsPerPage + rowsPerPage
   );
+
+  const handleGetReceipt = async (id) => {
+    try {
+      const res = await receiptService.getReceiptById(id);
+      setSelectedReceipt(res);
+    } catch (error) {
+      toast.error("Lỗi khi lấy thông tin sản phẩm");
+    }
+  };
 
   return (
     <>
@@ -117,12 +93,12 @@ const SupplierTable = () => {
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-gray-100 capitalize">
-            Danh sách nhà cung cấp
+            Danh sách phiếu nhập
           </h2>
           <SearchBar
             searchTerm={searchTerm}
             handleSearch={handleSearch}
-            placeholder="Tìm kiếm nhà cung cấp"
+            placeholder="Tìm kiếm phiếu nhập"
           />
         </div>
         <div className="overflow-x-auto">
@@ -133,37 +109,29 @@ const SupplierTable = () => {
               handleSort={handleSort}
             />
             <tbody className="divide-y divide-gray-700">
-              {currentSuppliers?.map((supplier, index) => (
-                <tr key={supplier._id} className="hover:bg-gray-700">
+              {currentReceipts?.map((receipt) => (
+                <tr
+                  key={receipt._id}
+                  className="hover:bg-gray-700 cursor-pointer"
+                  onClick={() => handleGetReceipt(receipt._id)}
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {currentPage * rowsPerPage + index + 1}
+                    {receipt._id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {supplier.name}
+                    {receipt.supplier_id.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {supplier.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {supplier.address}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {supplier.phone}
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    <button
-                      className="text-blue-500 hover:text-blue-700 mr-2"
-                      onClick={() => handleShowEditSupplier(supplier)}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 ">
+                    <span
+                      className={
+                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                      }
                     >
-                      <Edit size={20} />
-                    </button>
-                    <button
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => openDeleteModal(supplier)}
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                      {receipt.total_price.toLocaleString()}đ
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {new Date(receipt.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))}
@@ -172,7 +140,7 @@ const SupplierTable = () => {
         </div>
         <TablePagination
           component="div"
-          count={filteredSuppliers?.length || 0}
+          count={filteredReceipts?.length || 0}
           page={currentPage}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -195,14 +163,16 @@ const SupplierTable = () => {
             },
           }}
         />
-        <ConfirmDeleteModal
-          isOpen={isModalOpen}
-          onClose={closeDeleteModal}
-          onConfirm={confirmDelete}
-        />
       </motion.div>
+
+      {selectedReceipt && (
+        <ReceiptDetailTable
+          receiptDetails={selectedReceipt.details}
+          receiptId={selectedReceipt._id}
+        />
+      )}
     </>
   );
 };
 
-export default SupplierTable;
+export default ReceiptTable;

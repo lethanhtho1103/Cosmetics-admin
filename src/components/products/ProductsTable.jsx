@@ -257,7 +257,13 @@ const ProductsTable = () => {
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {formatNumber(product?.price)}đ
+                    <span
+                      className={
+                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                      }
+                    >
+                      {formatNumber(product?.price)}đ
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {formatNumber(product?.quantity)}

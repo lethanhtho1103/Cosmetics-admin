@@ -11,16 +11,18 @@ import Category1Page from "./pages/Category1Page";
 import Category2Page from "./pages/Category2Page";
 import Category3Page from "./pages/Category3Page";
 import LoginAdmin from "./pages/LoginPage";
+import PromotionsPage from "./pages/PromotionsPage";
+import PromotionalProductPage from "./pages/PromotionalProductPage";
+import ContactsPage from "./pages/ContactsPage";
+import ReceiptsPage from "./pages/ReceiptsPage";
+
 import { useSelector } from "react-redux";
 import { OrderProvider } from "./contexts/OrderContext";
 import { ProductProvider } from "./contexts/ProductContext";
 import { CategoryProvider } from "./contexts/CategoryContext";
 import { SuppliersProvider } from "./contexts/SuppliersContext";
-
-import PromotionsPage from "./pages/PromotionsPage";
+import { ReceiptProvider } from "./contexts/ReceiptContext";
 import { PromotionsProvider } from "./contexts/PromotionsContext";
-import PromotionalProductPage from "./pages/PromotionalProductPage";
-import ContactsPage from "./pages/ContactsPage";
 
 function App() {
   const isAdmin = useSelector((state) => state.auth.login?.currentAdmin?.admin);
@@ -83,6 +85,14 @@ function App() {
                     <SuppliersProvider>
                       <SuppliersPage />
                     </SuppliersProvider>
+                  }
+                />
+                <Route
+                  path="/receipts"
+                  element={
+                    <ReceiptProvider>
+                      <ReceiptsPage />
+                    </ReceiptProvider>
                   }
                 />
                 <Route
