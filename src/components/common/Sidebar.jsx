@@ -10,6 +10,7 @@ import {
   ChevronUp,
   Mail,
   GiftIcon,
+  Package,
 } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -46,6 +47,21 @@ const SIDEBAR_ITEMS = [
     ],
   },
   {
+    name: "Quản Lý Nhập Hàng",
+    icon: Package,
+    color: "#6EE7B7",
+    subItems: [
+      {
+        name: "Nhà Cung Cấp",
+        href: "/suppliers",
+      },
+      {
+        name: "Phiếu Nhập",
+        href: "/receipts",
+      },
+    ],
+  },
+  {
     name: "Khuyến Mãi",
     icon: GiftIcon,
     color: "orange",
@@ -64,7 +80,7 @@ const SIDEBAR_ITEMS = [
   { name: "Doanh Số", icon: DollarSign, color: "#10B981", href: "/sales" },
   { name: "Đơn Hàng", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
   { name: "Liên Hệ", icon: Mail, color: "#3B82F6", href: "/contacts" },
-  { name: "Tài khoản", icon: Settings, color: "#6EE7B7", href: "/settings" },
+  { name: "Tài khoản", icon: Settings, color: "#E11D48", href: "/settings" },
 ];
 
 const Sidebar = () => {

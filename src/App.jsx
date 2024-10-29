@@ -2,6 +2,7 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import Sidebar from "./components/common/Sidebar";
 import OverviewPage from "./pages/OverviewPage";
 import ProductsPage from "./pages/ProductsPage";
+import SuppliersPage from "./pages/SuppliersPage";
 import UsersPage from "./pages/UsersPage";
 import SalesPage from "./pages/SalesPage";
 import OrdersPage from "./pages/OrdersPage";
@@ -14,6 +15,8 @@ import { useSelector } from "react-redux";
 import { OrderProvider } from "./contexts/OrderContext";
 import { ProductProvider } from "./contexts/ProductContext";
 import { CategoryProvider } from "./contexts/CategoryContext";
+import { SuppliersProvider } from "./contexts/SuppliersContext";
+
 import PromotionsPage from "./pages/PromotionsPage";
 import { PromotionsProvider } from "./contexts/PromotionsContext";
 import PromotionalProductPage from "./pages/PromotionalProductPage";
@@ -34,7 +37,6 @@ function App() {
           path="*"
           element={
             <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
-              {/* Background and sidebar */}
               <div className="fixed inset-0 z-0">
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 opacity-80" />
                 <div className="absolute inset-0 backdrop-blur-sm" />
@@ -73,6 +75,14 @@ function App() {
                     <ProductProvider>
                       <ProductsPage />
                     </ProductProvider>
+                  }
+                />
+                <Route
+                  path="/suppliers"
+                  element={
+                    <SuppliersProvider>
+                      <SuppliersPage />
+                    </SuppliersProvider>
                   }
                 />
                 <Route
