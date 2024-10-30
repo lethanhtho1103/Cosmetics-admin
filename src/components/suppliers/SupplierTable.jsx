@@ -5,9 +5,10 @@ import SearchBar from "../common/SearchBar";
 import TableHeader from "../common/TableHeader";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 import SuppliersContext from "../../contexts/SuppliersContext";
-import categoryService from "../../services/categoryService";
 import { toast } from "react-toastify";
 import TablePagination from "@mui/material/TablePagination";
+import AddSupplierModal from "./AddSupplierModal";
+import suppliersService from "../../services/suppliersService";
 
 const SupplierTable = () => {
   const { handleShowEditSupplier, suppliers, handleGetAllSuppliers } =
@@ -65,7 +66,7 @@ const SupplierTable = () => {
 
   const handleDelete = async (supplierId) => {
     try {
-      const res = await categoryService.deleteCategory1(supplierId);
+      const res = await suppliersService.deleteSupplierById(supplierId);
       toast.success(res.message);
       handleGetAllSuppliers();
       if (currentPage > 0 && filteredSuppliers.length === 1) {
@@ -109,6 +110,7 @@ const SupplierTable = () => {
 
   return (
     <>
+      <AddSupplierModal />
       <motion.div
         className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8"
         initial={{ opacity: 0, y: 20 }}
@@ -154,7 +156,7 @@ const SupplierTable = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <button
                       className="text-blue-500 hover:text-blue-700 mr-2"
-                      onClick={() => handleShowEditSupplier(supplier)}
+                      onClick={() => handleShowEditSupplier(supplier._id)}
                     >
                       <Edit size={20} />
                     </button>

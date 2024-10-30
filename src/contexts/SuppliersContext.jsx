@@ -13,7 +13,7 @@ export const SuppliersProvider = ({ children }) => {
   const handleShowEditSupplier = async (id) => {
     try {
       const res = await suppliersService.getSupplierById(id);
-      setSupplier(res.data);
+      setSupplier(res);
       setModalOpenEdit(true);
     } catch (error) {
       toast.error("Lỗi khi lấy thông tin sản phẩm");
