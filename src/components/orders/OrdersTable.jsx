@@ -4,16 +4,21 @@ import { Search, Eye } from "lucide-react";
 import OrderContext from "../../contexts/OrderContext";
 import ViewOrder from "./ViewOrder";
 import TableHeader from "../common/TableHeader";
+import TablePagination from "@mui/material/TablePagination";
 
 const OrdersTable = () => {
   const { orders } = useContext(OrderContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [orderId, setOrderId] = useState("");
+
   const [sortConfig, setSortConfig] = useState({
     key: "",
     direction: "ascending",
   });
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const formatNumber = (num) =>
     num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -30,10 +35,20 @@ const OrdersTable = () => {
     { key: "index", label: "STT", sortable: false },
     { key: "username", label: "Tên", sortable: true },
     { key: "totalPrice", label: "Tổng tiền", sortable: true },
-    { key: "status", label: "Trạng thái", sortable: true },
+    { key: "shipping_method", label: "Vận chuyển", sortable: true },
     { key: "orderDate", label: "Ngày đặt", sortable: true },
+    { key: "status", label: "Trạng thái", sortable: true },
+    { key: "is_payment", label: "Thanh toán", sortable: true },
     { key: "actions", label: "Hành động", sortable: false },
   ];
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -51,24 +66,25 @@ const OrdersTable = () => {
           ? "đang vận chuyển"
           : "đã hủy";
 
+      const shippingMethod =
+        order?.shipping_method === "express" ? "nhanh" : "tiêu chuẩn";
+
+      const paymentStatus =
+        order.is_payment === "yes" ? "đã thanh toán" : "chưa thanh toán";
+
       const totalPrice = order.total_price.toString().toLowerCase();
       const orderDate = formatDate(order?.order_date).toLowerCase();
+
       return (
         username.includes(term) ||
         orderStatus.includes(term) ||
+        shippingMethod.includes(term) ||
+        paymentStatus.includes(term) ||
         totalPrice.includes(term) ||
         orderDate.includes(term)
       );
     });
     setFilteredOrders(filtered);
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const year = date.getFullYear();
-    return `${month}/${day}/${year}`;
   };
 
   const handleSort = (key) => {
@@ -92,6 +108,22 @@ const OrdersTable = () => {
         return direction === "ascending"
           ? a.status.localeCompare(b.status)
           : b.status.localeCompare(a.status);
+      } else if (key === "shipping_method") {
+        const methodA =
+          a.shipping_method === "express" ? "nhanh" : "tiêu chuẩn";
+        const methodB =
+          b.shipping_method === "express" ? "nhanh" : "tiêu chuẩn";
+        return direction === "ascending"
+          ? methodA.localeCompare(methodB)
+          : methodB.localeCompare(methodA);
+      } else if (key === "is_payment") {
+        const paymentA =
+          a.is_payment === "yes" ? "đã thanh toán" : "chưa thanh toán";
+        const paymentB =
+          b.is_payment === "yes" ? "đã thanh toán" : "chưa thanh toán";
+        return direction === "ascending"
+          ? paymentA.localeCompare(paymentB)
+          : paymentB.localeCompare(paymentA);
       } else if (key === "orderDate") {
         const dateA = new Date(a.order_date);
         const dateB = new Date(b.order_date);
@@ -105,6 +137,15 @@ const OrdersTable = () => {
   useEffect(() => {
     setFilteredOrders(orders);
   }, [orders]);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <motion.div
@@ -136,57 +177,96 @@ const OrdersTable = () => {
             handleSort={handleSort}
           />
           <tbody className="divide divide-gray-700">
-            {filteredOrders?.map((order, index) => (
-              <motion.tr
-                key={order._id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                  {index + 1}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                  {order?.user_id?.username}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                  {formatNumber(order.total_price)}đ
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      order.status === "delivered"
-                        ? "bg-green-100 text-green-800"
+            {filteredOrders
+              ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((order, index) => (
+                <motion.tr
+                  key={order._id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                    {index + 1 + page * rowsPerPage}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                    {order?.user_id?.username}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                    {formatNumber(order.total_price)}đ
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                    {order?.shipping_method === "express"
+                      ? "Nhanh"
+                      : "Tiêu chuẩn"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
+                    {formatDate(order.order_date)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        order.status === "delivered"
+                          ? "bg-green-100 text-green-800"
+                          : order.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : order.status === "shipped"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {order.status === "delivered"
+                        ? "Đã giao"
                         : order.status === "pending"
-                        ? "bg-yellow-100 text-yellow-800"
+                        ? "Đang chờ xử lý"
                         : order.status === "shipped"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {order.status === "delivered"
-                      ? "Đã giao"
-                      : order.status === "pending"
-                      ? "Đang chờ xử lý"
-                      : order.status === "shipped"
-                      ? "Đang vận chuyển"
-                      : "Đã hủy"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
-                  {formatDate(order.order_date)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100 flex justify-start">
-                  <Eye
-                    className="cursor-pointer text-blue-500 hover:text-blue-700"
-                    onClick={() => handleShowViewOrder(order._id)}
-                  />
-                </td>
-              </motion.tr>
-            ))}
+                        ? "Đang vận chuyển"
+                        : "Đã hủy"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                    {order.is_payment === "yes"
+                      ? "Đã thanh toán"
+                      : "Chưa thanh toán"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                      onClick={() => handleShowViewOrder(order._id)}
+                      className="text-blue-400 hover:text-blue-600"
+                    >
+                      <Eye size={18} />
+                    </button>
+                  </td>
+                </motion.tr>
+              ))}
           </tbody>
         </table>
       </div>
+      <TablePagination
+        component="div"
+        count={filteredOrders.length}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        rowsPerPageOptions={[5, 10, 15, 20]}
+        labelRowsPerPage="Hiển thị"
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{
+          color: "white",
+          "& .MuiTablePagination-actions": {
+            color: "white",
+          },
+          "& .MuiTablePagination-selectLabel": {
+            color: "white",
+          },
+          "& .MuiTablePagination-input": {
+            color: "white",
+          },
+          "& .MuiTablePagination-selectIcon": {
+            color: "white",
+          },
+        }}
+      />
       {orderId && (
         <ViewOrder
           orderId={orderId}

@@ -113,7 +113,7 @@ const Sidebar = () => {
           <Menu size={24} />
         </motion.button>
 
-        <nav className="mt-8 flex-grow overflow-y-auto max-h-screen">
+        <nav className="mt-8 flex-grow overflow-y-auto overflow-x-hidden max-h-screen">
           {SIDEBAR_ITEMS.map((item) => {
             const isActive =
               location.pathname === item.href || isSubItemActive(item.subItems);
