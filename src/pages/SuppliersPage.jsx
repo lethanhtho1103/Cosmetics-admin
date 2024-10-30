@@ -2,6 +2,7 @@ import Header from "../components/common/Header";
 import { useContext } from "react";
 import SuppliersContext from "../contexts/SuppliersContext";
 import SupplierTable from "../components/suppliers/SupplierTable";
+import { CirclePlus } from "lucide-react";
 
 const SuppliersPage = () => {
   const { handleShowAddSupplier } = useContext(SuppliersContext);
@@ -11,9 +12,10 @@ const SuppliersPage = () => {
       <Header title="Nhà Cung Cấp" />
       <div className="max-w-7xl mx-auto pt-4 px-4 sm:px-6 lg:px-8">
         <button
-          className="px-6 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full font-semibold shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 "
+          className="flex items-center px-6 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full font-semibold shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 "
           onClick={() => handleShowAddSupplier()}
         >
+          <CirclePlus size={20} className="mr-1" />
           Thêm nhà cung cấp
         </button>
       </div>

@@ -51,6 +51,7 @@ const UpdateReceiptDetail = () => {
         quantity,
         import_price: importPrice,
       });
+
       toast.success("Cập nhật chi tiết phiếu nhập thành công");
       closeModal();
     } catch (error) {
@@ -73,19 +74,23 @@ const UpdateReceiptDetail = () => {
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
             Chỉnh Sửa Chi Tiết Phiếu Nhập
           </h2>
-          <div className="space-y-5">
+          <div className="space-y-2">
             <div className="relative">
+              <label className="text-xs text-blue-500 px-1">Tên sản phẩm</label>
               <input
                 type="text"
                 value={productName}
                 disabled
                 className="w-full px-4 py-2 border rounded-lg text-gray-800 bg-gray-200"
               />
-              <label className="absolute left-2 top-0 text-xs text-blue-500 bg-white px-1">
-                Tên sản phẩm
-              </label>
             </div>
             <div className="relative">
+              <label
+                htmlFor="quantity"
+                className=" text-xs text-blue-500  px-1"
+              >
+                Số lượng
+              </label>
               <input
                 id="quantity"
                 type="number"
@@ -96,17 +101,18 @@ const UpdateReceiptDetail = () => {
                   errors.quantity ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              <label
-                htmlFor="quantity"
-                className="absolute left-2 top-0 text-xs text-blue-500 bg-white px-1"
-              >
-                Số lượng
-              </label>
+
               {errors.quantity && (
                 <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>
               )}
             </div>
             <div className="relative">
+              <label
+                htmlFor="importPrice"
+                className="text-xs text-blue-500  px-1"
+              >
+                Đơn giá
+              </label>
               <input
                 id="importPrice"
                 type="number"
@@ -117,12 +123,7 @@ const UpdateReceiptDetail = () => {
                   errors.importPrice ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              <label
-                htmlFor="importPrice"
-                className="absolute left-2 top-0 text-xs text-blue-500 bg-white px-1"
-              >
-                Đơn giá
-              </label>
+
               {errors.importPrice && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.importPrice}

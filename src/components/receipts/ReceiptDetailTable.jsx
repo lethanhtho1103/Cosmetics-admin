@@ -6,6 +6,9 @@ import TablePagination from "@mui/material/TablePagination";
 import ReceiptContext from "../../contexts/ReceiptContext";
 import { Edit, Trash2 } from "lucide-react";
 import UpdateReceiptDetail from "./UpdateReceiptDetail";
+import { toast } from "react-toastify";
+import receiptService from "../../services/receiptService";
+import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
 
 const ReceiptDetailTable = ({ receiptDetails, receiptId }) => {
   const { handleShowEditReceiptDetail } = useContext(ReceiptContext);
@@ -14,6 +17,8 @@ const ReceiptDetailTable = ({ receiptDetails, receiptId }) => {
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   useEffect(() => {
     setFilteredDetails(receiptDetails);
@@ -72,6 +77,39 @@ const ReceiptDetailTable = ({ receiptDetails, receiptId }) => {
     currentPage * rowsPerPage,
     currentPage * rowsPerPage + rowsPerPage
   );
+
+  const handleDelete = async (receiptDetailId) => {
+    try {
+      const res = await receiptService.deleteReceiptDetail({
+        receiptDetailId,
+      });
+      toast.success(res.message);
+
+      // Xóa sản phẩm khỏi danh sách sau khi xóa thành công
+      setFilteredDetails((prevDetails) =>
+        prevDetails.filter((detail) => detail._id !== receiptDetailId)
+      );
+    } catch (error) {
+      toast.error("Lỗi khi xóa");
+    }
+  };
+
+  const openDeleteModal = (product) => {
+    setProductToDelete(product);
+    setIsModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsModalOpen(false);
+    setProductToDelete(null);
+  };
+
+  const confirmDelete = () => {
+    if (productToDelete) {
+      handleDelete(productToDelete._id);
+      closeDeleteModal();
+    }
+  };
 
   return (
     <>
@@ -135,7 +173,7 @@ const ReceiptDetailTable = ({ receiptDetails, receiptId }) => {
                       className="text-red-500 hover:text-red-700"
                       onClick={(e) => {
                         e.stopPropagation();
-                        // openDeleteModal(receipt);
+                        openDeleteModal(product);
                       }}
                     >
                       <Trash2 size={20} />
@@ -162,6 +200,12 @@ const ReceiptDetailTable = ({ receiptDetails, receiptId }) => {
             "& .MuiTablePagination-input": { color: "white" },
             "& .MuiTablePagination-selectIcon": { color: "white" },
           }}
+        />
+        <ConfirmDeleteModal
+          isOpen={isModalOpen}
+          onClose={closeDeleteModal}
+          onConfirm={confirmDelete}
+          productName={productToDelete?.product_id?.name}
         />
       </motion.div>
     </>

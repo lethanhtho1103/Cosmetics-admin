@@ -53,6 +53,15 @@ const receiptService = {
       console.error(error);
     }
   },
+
+  async deleteReceiptDetail({ receiptDetailId }) {
+    try {
+      const res = await axios.delete(`/api/receipt-detail/${receiptDetailId}`);
+      return res.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 export default receiptService;
