@@ -5,6 +5,7 @@ import OrderContext from "../../contexts/OrderContext";
 import ViewOrder from "./ViewOrder";
 import TableHeader from "../common/TableHeader";
 import TablePagination from "@mui/material/TablePagination";
+import { Tooltip } from "@mui/material";
 
 const OrdersTable = () => {
   const { orders } = useContext(OrderContext);
@@ -179,6 +180,7 @@ const OrdersTable = () => {
           <tbody className="divide divide-gray-700">
             {filteredOrders
               ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .filter((order) => order.status !== "pending")
               .map((order, index) => (
                 <motion.tr
                   key={order._id}
@@ -230,12 +232,14 @@ const OrdersTable = () => {
                       : "Chưa thanh toán"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleShowViewOrder(order._id)}
-                      className="text-blue-400 hover:text-blue-600"
-                    >
-                      <Eye size={18} />
-                    </button>
+                    <Tooltip title="Xem chi tiết đơn hàng" arrow>
+                      <button
+                        onClick={() => handleShowViewOrder(order._id)}
+                        className="text-blue-400 hover:text-blue-600"
+                      >
+                        <Eye size={18} />
+                      </button>
+                    </Tooltip>
                   </td>
                 </motion.tr>
               ))}

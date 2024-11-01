@@ -1,4 +1,4 @@
-import { Package, ShoppingBag, Users, Zap } from "lucide-react";
+import { ShoppingBag, ShoppingCart, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
@@ -20,44 +20,37 @@ const OverviewPage = () => {
   const [categoriesTopSales, setCategoriesTopSales] = useState([]);
   const [orders, setOrders] = useState([]);
 
-  const handleGetAllOrders = async () => {
-    const res = await orderService.getAllOrder();
-
-    setOrders(res?.data?.filter((order) => order.status === "pending"));
+  const fetchOrders = async () => {
+    try {
+      const res = await orderService.getAllOrder();
+      setOrders(res?.data?.filter((order) => order.status === "pending") || []);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
   };
 
-  function formatNumberWithCommas(number) {
+  const fetchStatisticsAndCategories = async () => {
+    try {
+      const [statisticsRes, categoriesTopSalesRes] = await Promise.all([
+        statisticsService.getStatistics(),
+        statisticsService.getCategoriesTopSales(),
+      ]);
+
+      setStatistics(statisticsRes.data);
+      setCategoriesTopSales(categoriesTopSalesRes.data);
+    } catch (error) {
+      console.error("Error fetching statistics and categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+    fetchStatisticsAndCategories();
+  }, []);
+
+  const formatNumberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-  const handleGetStatistics = async () => {
-    return statisticsService.getStatistics();
   };
-
-  const handleGetCategoriesTopSales = async () => {
-    return statisticsService.getCategoriesTopSales();
-  };
-
-  useEffect(() => {
-    handleGetAllOrders();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [statisticsRes, categoriesTopSalesRes] = await Promise.all([
-          handleGetStatistics(),
-          handleGetCategoriesTopSales(),
-        ]);
-
-        setStatistics(statisticsRes.data);
-        setCategoriesTopSales(categoriesTopSalesRes.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
@@ -73,24 +66,24 @@ const OverviewPage = () => {
           <StatCard
             name="Tổng Doanh Thu"
             icon={Zap}
-            value={formatNumberWithCommas(statistics?.totalRevenue)}
+            value={formatNumberWithCommas(statistics.totalRevenue)}
             color="#6366F1"
           />
           <StatCard
             name="Tổng Người Dùng"
             icon={Users}
-            value={statistics?.totalUsers}
+            value={statistics.totalUsers}
             color="#8B5CF6"
           />
           <StatCard
             name="Tổng Sản Phẩm"
             icon={ShoppingBag}
-            value={statistics?.totalProducts}
+            value={statistics.totalProducts}
             color="#EC4899"
           />
           <StatCard
             name="Tổng Đơn Hàng"
-            icon={Package}
+            icon={ShoppingCart}
             value={statistics.totalOrders}
             color="#F59E0B"
           />
@@ -106,15 +99,16 @@ const OverviewPage = () => {
         <div className="grid mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
           <OrdersPendingTable
             orders={orders}
-            handleGetAllOrders={handleGetAllOrders}
+            handleGetAllOrders={fetchOrders}
           />
         </div>
 
-        <div className="grid  mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
+        <div className="grid mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
           <CategoryDistributionChart categoriesTopSales={categoriesTopSales} />
         </div>
       </main>
     </div>
   );
 };
+
 export default OverviewPage;

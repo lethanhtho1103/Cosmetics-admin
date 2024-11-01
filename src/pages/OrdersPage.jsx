@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, Package, Truck, XCircle } from "lucide-react";
+import { CheckCircle, Clock, ShoppingCart, Truck, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
@@ -53,7 +53,7 @@ const OrdersPage = () => {
         >
           <StatCard
             name="Tổng Đơn Hàng"
-            icon={Package}
+            icon={ShoppingCart}
             value={orderStats.totalOrders}
             color="#6366F1"
           />

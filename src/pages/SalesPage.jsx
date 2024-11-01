@@ -4,8 +4,9 @@ import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import { CreditCard, DollarSign, ShoppingCart, TrendingUp } from "lucide-react";
 import SalesOverviewChart from "../components/sales/SalesOverviewChart";
-import SalesByCategoryChart from "../components/sales/SalesByCategoryChart";
-import DailySalesTrend from "../components/sales/DailySalesTrend";
+import { useEffect, useState } from "react";
+import statisticsService from "../services/statisticsService";
+import ProductsTopSalesTable from "../components/sales/ProductsTopSalesTable";
 
 const salesStats = {
   totalRevenue: "$1,234,567",
@@ -15,6 +16,15 @@ const salesStats = {
 };
 
 const SalesPage = () => {
+  const [productsTopSales, setProductsTopSales] = useState([]);
+  const handleGetProductsTopSales = async () => {
+    const res = await statisticsService.getProductsTopSales();
+    setProductsTopSales(res.data);
+  };
+
+  useEffect(() => {
+    handleGetProductsTopSales();
+  }, []);
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <Header title="Bảng Điều Khiển Bán Hàng" />
@@ -54,9 +64,8 @@ const SalesPage = () => {
 
         <SalesOverviewChart />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <SalesByCategoryChart />
-          <DailySalesTrend />
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8">
+          <ProductsTopSalesTable productsTopSales={productsTopSales} />
         </div>
       </main>
     </div>

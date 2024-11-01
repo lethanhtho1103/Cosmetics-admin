@@ -19,6 +19,15 @@ const statisticsService = {
     }
   },
 
+  async getProductsTopSales() {
+    try {
+      const res = await axios.get("/api/statistics/top-products-sales");
+      return res.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Thất bại");
+    }
+  },
+
   async getOrderStatisticsByMonth({ year, month }) {
     try {
       const res = await axios.get("/api/statistics/order/month", {

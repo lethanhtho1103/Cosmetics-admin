@@ -1,6 +1,6 @@
 import {
   BarChart2,
-  DollarSign,
+  ChartLine,
   Menu,
   Settings,
   ShoppingBag,
@@ -49,7 +49,7 @@ const SIDEBAR_ITEMS = [
   {
     name: "Quản Lý Nhập Hàng",
     icon: Package,
-    color: "#6EE7B7",
+    color: "yellow",
     subItems: [
       {
         name: "Nhà Cung Cấp",
@@ -77,12 +77,11 @@ const SIDEBAR_ITEMS = [
     ],
   },
   { name: "Người Dùng", icon: Users, color: "#EC4899", href: "/users" },
-  { name: "Doanh Số", icon: DollarSign, color: "#10B981", href: "/sales" },
   { name: "Đơn Hàng", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
-  { name: "Liên Hệ", icon: Mail, color: "#3B82F6", href: "/contacts" },
+  { name: "Liên Hệ", icon: Mail, color: "#10B981", href: "/contacts" },
+  { name: "Thống Kê", icon: ChartLine, color: "#3B82F6", href: "/sales" },
   { name: "Tài khoản", icon: Settings, color: "#E11D48", href: "/settings" },
 ];
-
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [openSubMenu, setOpenSubMenu] = useState(null);

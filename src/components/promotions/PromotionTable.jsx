@@ -9,6 +9,7 @@ import PromotionsContext from "../../contexts/PromotionsContext";
 import { Edit, Trash2 } from "lucide-react";
 import AddPromotionModal from "./AddPromotionModal";
 import promotionsService from "../../services/promotionsService";
+import { Tooltip } from "@mui/material";
 
 const PromotionTable = () => {
   const { promotions, handleGetAllPromotion, handleShowEditPromotion } =
@@ -203,18 +204,22 @@ const PromotionTable = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap flex text-sm text-gray-300">
-                    <button
-                      className="text-indigo-400 hover:text-indigo-300 mr-2"
-                      onClick={() => handleShowEditPromotion(promotion?._id)}
-                    >
-                      <Edit size={18} />
-                    </button>
-                    <button
-                      className="text-red-600 hover:text-red-900"
-                      onClick={() => openDeleteModal(promotion)}
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                    <Tooltip title="Chỉnh sửa" arrow>
+                      <button
+                        className="text-indigo-400 hover:text-indigo-300 mr-2"
+                        onClick={() => handleShowEditPromotion(promotion?._id)}
+                      >
+                        <Edit size={18} />
+                      </button>
+                    </Tooltip>
+                    <Tooltip title="Xóa" arrow>
+                      <button
+                        className="text-red-600 hover:text-red-900"
+                        onClick={() => openDeleteModal(promotion)}
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}

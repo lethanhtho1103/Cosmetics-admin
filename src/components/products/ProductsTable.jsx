@@ -10,6 +10,7 @@ import Select from "react-select";
 import SearchBar from "../common/SearchBar";
 import TableHeader from "../common/TableHeader";
 import TablePagination from "@mui/material/TablePagination";
+import { Tooltip } from "@mui/material";
 
 const ProductsTable = () => {
   const { handleShowEditProduct, categories, formatNumber } =
@@ -279,18 +280,22 @@ const ProductsTable = () => {
                     {product.sold_quantity}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    <button className="text-indigo-400 hover:text-indigo-300 mr-2">
-                      <Edit
-                        size={18}
-                        onClick={() => handleShowEditProduct(product?.name)}
-                      />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(product)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                    <Tooltip title="Chỉnh sửa" arrow>
+                      <button className="text-indigo-400 hover:text-indigo-300 mr-2">
+                        <Edit
+                          size={18}
+                          onClick={() => handleShowEditProduct(product?.name)}
+                        />
+                      </button>
+                    </Tooltip>
+                    <Tooltip title="Xóa" arrow>
+                      <button
+                        onClick={() => openDeleteModal(product)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </Tooltip>
                   </td>
                 </motion.tr>
               ))}

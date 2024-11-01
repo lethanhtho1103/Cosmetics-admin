@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import TablePagination from "@mui/material/TablePagination";
 import AddSupplierModal from "./AddSupplierModal";
 import suppliersService from "../../services/suppliersService";
+import { Tooltip } from "@mui/material";
 
 const SupplierTable = () => {
   const { handleShowEditSupplier, suppliers, handleGetAllSuppliers } =
@@ -154,18 +155,22 @@ const SupplierTable = () => {
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    <button
-                      className="text-blue-500 hover:text-blue-700 mr-2"
-                      onClick={() => handleShowEditSupplier(supplier._id)}
-                    >
-                      <Edit size={20} />
-                    </button>
-                    <button
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => openDeleteModal(supplier)}
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                    <Tooltip title="Chỉnh sửa" arrow>
+                      <button
+                        className="text-blue-500 hover:text-blue-700 mr-2"
+                        onClick={() => handleShowEditSupplier(supplier._id)}
+                      >
+                        <Edit size={20} />
+                      </button>
+                    </Tooltip>
+                    <Tooltip title="Xóa" arrow>
+                      <button
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => openDeleteModal(supplier)}
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}

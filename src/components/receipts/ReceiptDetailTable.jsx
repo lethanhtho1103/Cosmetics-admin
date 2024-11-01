@@ -9,6 +9,7 @@ import UpdateReceiptDetail from "./UpdateReceiptDetail";
 import { toast } from "react-toastify";
 import receiptService from "../../services/receiptService";
 import ConfirmDeleteModal from "../common/ConfirmDeleteModal";
+import { Tooltip } from "@mui/material";
 
 const ReceiptDetailTable = ({ receiptDetails, receiptId }) => {
   const { handleShowEditReceiptDetail } = useContext(ReceiptContext);
@@ -160,24 +161,28 @@ const ReceiptDetailTable = ({ receiptDetails, receiptId }) => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    <button
-                      className="text-blue-500 hover:text-blue-700 mr-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleShowEditReceiptDetail(product._id);
-                      }}
-                    >
-                      <Edit size={20} />
-                    </button>
-                    <button
-                      className="text-red-500 hover:text-red-700"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openDeleteModal(product);
-                      }}
-                    >
-                      <Trash2 size={20} />
-                    </button>
+                    <Tooltip title="Chỉnh sửa" arrow>
+                      <button
+                        className="text-blue-500 hover:text-blue-700 mr-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShowEditReceiptDetail(product._id);
+                        }}
+                      >
+                        <Edit size={20} />
+                      </button>
+                    </Tooltip>
+                    <Tooltip title="Xóa" arrow>
+                      <button
+                        className="text-red-500 hover:text-red-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(product);
+                        }}
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}

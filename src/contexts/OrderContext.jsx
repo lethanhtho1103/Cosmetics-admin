@@ -8,7 +8,7 @@ export const OrderProvider = ({ children }) => {
 
   const handleGetAllOrders = async () => {
     const res = await orderService.getAllOrder();
-    setOrders(res?.data?.filter((order) => order.status !== "pending"));
+    setOrders(res?.data);
   };
 
   useEffect(() => {
