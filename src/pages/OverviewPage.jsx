@@ -6,6 +6,8 @@ import CategoryDistributionChart from "../components/overview/CategoryDistributi
 import DailyOrders from "../components/orders/DailyOrders";
 import { useEffect, useState } from "react";
 import statisticsService from "../services/statisticsService";
+import orderService from "../services/orderService";
+import OrdersPendingTable from "../components/overview/OrdersPendingTable";
 
 const OverviewPage = () => {
   const [statistics, setStatistics] = useState({
@@ -16,6 +18,13 @@ const OverviewPage = () => {
   });
 
   const [categoriesTopSales, setCategoriesTopSales] = useState([]);
+  const [orders, setOrders] = useState([]);
+
+  const handleGetAllOrders = async () => {
+    const res = await orderService.getAllOrder();
+
+    setOrders(res?.data?.filter((order) => order.status === "pending"));
+  };
 
   function formatNumberWithCommas(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -27,6 +36,10 @@ const OverviewPage = () => {
   const handleGetCategoriesTopSales = async () => {
     return statisticsService.getCategoriesTopSales();
   };
+
+  useEffect(() => {
+    handleGetAllOrders();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,6 +102,14 @@ const OverviewPage = () => {
             formatNumberWithCommas={formatNumberWithCommas}
           />
         </div>
+
+        <div className="grid mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
+          <OrdersPendingTable
+            orders={orders}
+            handleGetAllOrders={handleGetAllOrders}
+          />
+        </div>
+
         <div className="grid  mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
           <CategoryDistributionChart categoriesTopSales={categoriesTopSales} />
         </div>
