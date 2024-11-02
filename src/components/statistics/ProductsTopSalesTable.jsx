@@ -10,7 +10,7 @@ const ProductsTopSalesTable = ({ productsTopSales }) => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: "", direction: "" });
   const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleChangePage = (event, newPage) => {
     setCurrentPage(newPage);

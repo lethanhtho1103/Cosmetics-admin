@@ -79,7 +79,7 @@ const SIDEBAR_ITEMS = [
   { name: "Người Dùng", icon: Users, color: "#EC4899", href: "/users" },
   { name: "Đơn Hàng", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
   { name: "Liên Hệ", icon: Mail, color: "#10B981", href: "/contacts" },
-  { name: "Thống Kê", icon: ChartLine, color: "#3B82F6", href: "/sales" },
+  { name: "Thống Kê", icon: ChartLine, color: "#3B82F6", href: "/statistics" },
   { name: "Tài khoản", icon: Settings, color: "#E11D48", href: "/settings" },
 ];
 const Sidebar = () => {

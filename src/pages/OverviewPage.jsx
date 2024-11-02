@@ -1,4 +1,4 @@
-import { ShoppingBag, ShoppingCart, Users, Zap } from "lucide-react";
+import { ShoppingBag, Clock, Users, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
@@ -20,34 +20,30 @@ const OverviewPage = () => {
   const [categoriesTopSales, setCategoriesTopSales] = useState([]);
   const [orders, setOrders] = useState([]);
 
-  const fetchOrders = async () => {
+  const fetchData = async () => {
     try {
-      const res = await orderService.getAllOrder();
-      setOrders(res?.data?.filter((order) => order.status === "pending") || []);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
+      const [ordersRes, statisticsRes, categoriesTopSalesRes] =
+        await Promise.all([
+          orderService.getAllOrder(),
+          statisticsService.getStatistics(),
+          statisticsService.getCategoriesTopSales(),
+        ]);
 
-  const fetchStatisticsAndCategories = async () => {
-    try {
-      const [statisticsRes, categoriesTopSalesRes] = await Promise.all([
-        statisticsService.getStatistics(),
-        statisticsService.getCategoriesTopSales(),
-      ]);
-
+      setOrders(
+        ordersRes?.data?.filter((order) => order.status === "pending") || []
+      );
       setStatistics(statisticsRes.data);
       setCategoriesTopSales(categoriesTopSalesRes.data);
     } catch (error) {
-      console.error("Error fetching statistics and categories:", error);
+      console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    fetchOrders();
-    fetchStatisticsAndCategories();
+    fetchData();
   }, []);
 
+  // Hàm format số có dấu phẩy
   const formatNumberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
@@ -82,8 +78,8 @@ const OverviewPage = () => {
             color="#EC4899"
           />
           <StatCard
-            name="Tổng Đơn Hàng"
-            icon={ShoppingCart}
+            name="Đơn chờ xử lý"
+            icon={Clock}
             value={statistics.totalOrders}
             color="#F59E0B"
           />
@@ -97,10 +93,7 @@ const OverviewPage = () => {
         </div>
 
         <div className="grid mt-8 grid-cols-1 lg:grid-cols-1 gap-8">
-          <OrdersPendingTable
-            orders={orders}
-            handleGetAllOrders={fetchOrders}
-          />
+          <OrdersPendingTable orders={orders} handleGetAllOrders={fetchData} />
         </div>
 
         <div className="grid mt-8 grid-cols-1 lg:grid-cols-1 gap-8">

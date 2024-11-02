@@ -41,6 +41,19 @@ const statisticsService = {
       throw new Error(error.response?.data?.message || "Thất bại");
     }
   },
+
+  async getOrderStatisticsByYear({ year }) {
+    try {
+      const res = await axios.get("/api/statistics/order/year", {
+        params: {
+          year,
+        },
+      });
+      return res?.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Thất bại");
+    }
+  },
 };
 
 export default statisticsService;

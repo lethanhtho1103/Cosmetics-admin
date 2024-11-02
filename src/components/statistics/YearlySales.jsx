@@ -12,25 +12,23 @@ import {
 } from "recharts";
 import statisticsService from "../../services/statisticsService";
 
-const DailyOrders = ({ isOverview, formatNumberWithCommas }) => {
+const YearlySales = () => {
   const [ordersStatistics, setOrdersStatistics] = useState([]);
-  const [totalMonthlyRevenue, setTotalMonthlyRevenue] = useState(0);
+  const [totalYearlyRevenue, setTotalYearlyRevenue] = useState(0);
 
   const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
 
   const handleGetOrderStatistics = async () => {
     try {
-      const res = await statisticsService.getOrderStatisticsByMonth({
+      const res = await statisticsService.getOrderStatisticsByYear({
         year,
-        month,
       });
-      setTotalMonthlyRevenue(res.totalMonthlyRevenue);
+      setTotalYearlyRevenue(res.totalYearlyRevenue);
       const formattedData = res.data.map((item) => {
-        const key = isOverview ? "Doanh_thu" : "Don_hang";
+        const key = "Doanh_thu";
         return {
-          date: `${item.day}`,
-          [key]: isOverview ? item.totalRevenue : item.count,
+          date: `${item.month}`,
+          [key]: item.totalRevenue,
         };
       });
       setOrdersStatistics(formattedData);
@@ -42,7 +40,7 @@ const DailyOrders = ({ isOverview, formatNumberWithCommas }) => {
   useEffect(() => {
     handleGetOrderStatistics();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, month]);
+  }, [year]);
 
   return (
     <motion.div
@@ -52,18 +50,12 @@ const DailyOrders = ({ isOverview, formatNumberWithCommas }) => {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-5">
-        {isOverview ? (
-          <h2 className="text-xl font-semibold text-gray-100">
-            {`Doanh Thu Tháng ${month}: `}
-            <span className="text-red-500">
-              {formatNumberWithCommas(totalMonthlyRevenue)}đ
-            </span>
-          </h2>
-        ) : (
-          <h2 className="text-xl font-semibold text-gray-100 capitalize">
-            Thống kê đơn hàng
-          </h2>
-        )}
+        <h2 className="text-xl font-semibold text-gray-100">
+          {`Doanh Thu Năm ${year}: `}
+          <span className="text-red-500">
+            {totalYearlyRevenue.toLocaleString()}đ
+          </span>
+        </h2>
 
         <div>
           <label className="text-gray-200">Năm:</label>
@@ -75,19 +67,6 @@ const DailyOrders = ({ isOverview, formatNumberWithCommas }) => {
             {Array.from({ length: 10 }, (_, i) => (
               <option key={i} value={new Date().getFullYear() - i}>
                 {new Date().getFullYear() - i}
-              </option>
-            ))}
-          </select>
-
-          <label className="text-gray-200 ml-4">Tháng:</label>
-          <select
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-            className="ml-2 p-2 bg-gray-700 text-white rounded"
-          >
-            {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>
-                {i + 1}
               </option>
             ))}
           </select>
@@ -108,21 +87,12 @@ const DailyOrders = ({ isOverview, formatNumberWithCommas }) => {
               itemStyle={{ color: "#E5E7EB" }}
             />
             <Legend />
-            {isOverview ? (
-              <Line
-                type="monotone"
-                dataKey="Doanh_thu"
-                stroke="#8B5CF6"
-                strokeWidth={2}
-              />
-            ) : (
-              <Line
-                type="monotone"
-                dataKey="Don_hang"
-                stroke="#8B5CF6"
-                strokeWidth={2}
-              />
-            )}
+            <Line
+              type="monotone"
+              dataKey="Doanh_thu"
+              stroke="#8B5CF6"
+              strokeWidth={2}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -130,4 +100,4 @@ const DailyOrders = ({ isOverview, formatNumberWithCommas }) => {
   );
 };
 
-export default DailyOrders;
+export default YearlySales;

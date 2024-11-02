@@ -4,7 +4,7 @@ import OverviewPage from "./pages/OverviewPage";
 import ProductsPage from "./pages/ProductsPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import UsersPage from "./pages/UsersPage";
-import SalesPage from "./pages/SalesPage";
+import StatisticsPage from "./pages/StatisticsPage";
 import OrdersPage from "./pages/OrdersPage";
 import SettingsPage from "./pages/SettingsPage";
 import Category1Page from "./pages/Category1Page";
@@ -113,7 +113,7 @@ function App() {
                 />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/contacts" element={<ContactsPage />} />
-                <Route path="/sales" element={<SalesPage />} />
+                <Route path="/statistics" element={<StatisticsPage />} />
                 <Route
                   path="/orders"
                   element={
