@@ -10,14 +10,15 @@ const AddProduct = () => {
   const { categories, product, closeModal } = useContext(ProductContext);
   const initialProductData = {
     name: "",
-    price: "",
-    quantity: "",
+    price: 1,
+    quantity: 0,
     trademark: "",
     origin: "",
     category_id: "",
-    expiry: "",
+    expiry: 1,
     image: null,
     description: "",
+    
   };
   const [productData, setProductData] = useState(initialProductData);
   const [errors, setErrors] = useState({});
@@ -29,8 +30,8 @@ const AddProduct = () => {
     if (!productData.name) newErrors.name = "Tên sản phẩm là bắt buộc";
     if (!productData.price || productData.price <= 0)
       newErrors.price = "Giá phải lớn hơn 0";
-    if (!productData.quantity || productData.quantity <= 0)
-      newErrors.quantity = "Số lượng phải lớn hơn 0";
+    // if (!productData.quantity || productData.quantity <= 0)
+    //   newErrors.quantity = "Số lượng phải lớn hơn 0";
     if (!productData.trademark) newErrors.trademark = "Thương hiệu là bắt buộc";
     if (!productData.origin) newErrors.origin = "Xuất xứ là bắt buộc";
     if (!productData.category_id)
@@ -39,7 +40,8 @@ const AddProduct = () => {
       newErrors.expiry = "Hạn sử dụng phải lớn hơn 0";
     if (!productData.image && !product)
       newErrors.image = "Hình ảnh là bắt buộc";
-
+    if (!productData.description && !product)
+      newErrors.description = "Mô tả là bắt buộc";
     return newErrors;
   };
 
@@ -244,7 +246,7 @@ const AddProduct = () => {
               id="quantity"
               type="number"
               name="quantity"
-              min={1}
+              min={0}
               placeholder=" "
               value={productData.quantity}
               onChange={handleChange}

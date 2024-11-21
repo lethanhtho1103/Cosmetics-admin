@@ -15,18 +15,18 @@ const UsersTable = ({ users }) => {
     { label: "Tên", key: "username", sortable: true },
     { label: "Email", key: "email", sortable: true },
     { label: "SĐT", key: "phone", sortable: true },
-    { label: "Ngày sinh", key: "date_of_birth", sortable: true },
+    // { label: "Ngày sinh", key: "date_of_birth", sortable: true },
     { label: "Địa chỉ", key: "address", sortable: true },
     { label: "Loại tài khoản", key: "type", sortable: true },
   ];
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const year = date.getFullYear();
-    return `${month}/${day}/${year}`;
-  };
+  // const formatDate = (dateString) => {
+  //   const date = new Date(dateString);
+  //   const month = date.getMonth() + 1;
+  //   const day = date.getDate();
+  //   const year = date.getFullYear();
+  //   return `${month}/${day}/${year}`;
+  // };
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -151,11 +151,11 @@ const UsersTable = ({ users }) => {
                     </span>
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  {/* <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-white">
                       {formatDate(user?.date_of_birth)}
                     </div>
-                  </td>
+                  </td> */}
 
                   <td className="px-6 py-4 whitespace-nowrap">
                     {user?.ward ? (

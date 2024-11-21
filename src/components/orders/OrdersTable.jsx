@@ -33,8 +33,9 @@ const OrdersTable = () => {
   };
 
   const columns = [
-    { key: "index", label: "STT", sortable: false },
+    { key: "index", label: "Mã đơn hàng", sortable: false },
     { key: "username", label: "Tên", sortable: true },
+    { key: "phone", label: "SĐT", sortable: true },
     { key: "totalPrice", label: "Tổng tiền", sortable: true },
     { key: "shipping_method", label: "Vận chuyển", sortable: true },
     { key: "orderDate", label: "Ngày đặt", sortable: true },
@@ -162,7 +163,7 @@ const OrdersTable = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search orders..."
+            placeholder="Tìm kiếm..."
             className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={handleSearch}
@@ -181,7 +182,7 @@ const OrdersTable = () => {
             {filteredOrders
               ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .filter((order) => order.status !== "pending")
-              .map((order, index) => (
+              .map((order) => (
                 <motion.tr
                   key={order._id}
                   initial={{ opacity: 0 }}
@@ -189,10 +190,13 @@ const OrdersTable = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                    {index + 1 + page * rowsPerPage}
+                    {order._id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
                     {order?.user_id?.username}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                    {order?.user_id?.phone}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
                     {formatNumber(order.total_price)}đ

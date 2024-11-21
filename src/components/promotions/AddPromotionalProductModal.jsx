@@ -103,7 +103,7 @@ const AddPromotionalProductModal = () => {
       <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
         <div className="bg-white rounded-lg w-full max-w-lg p-8 relative shadow-lg">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-            {modalOpenEditProduct ? "Chỉnh Sửa Khuyến Mãi" : "Thêm Khuyến Mãi"}
+            {modalOpenEditProduct ? "Chỉnh Sửa Khuyến Mãi" : "Thêm Sản Phẩm Khuyến Mãi"}
           </h2>
           <div className="space-y-3">
             <div className="relative">
