@@ -199,7 +199,7 @@ const AddPromotionModal = () => {
 
             <div className="relative">
               <label htmlFor="discount_value" className="block text-gray-700">
-                Giá trị khuyến mãi
+                Giá trị khuyến mãi (%)
               </label>
               <input
                 id="discount_value"
